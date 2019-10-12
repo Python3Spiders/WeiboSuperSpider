@@ -40,7 +40,7 @@ filter = 1
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-    'Cookie': '''SCF=Am1dbZHR5nv7qMpjenuL46QRpkOaLTzcgqCDhWlsuqBt8r3ImYmyH1BSdwtkELab1n4ZbYO6NCZvypCWpUraFJ8.; ALF=1567323479; _T_WM=503fb02cabb51a8ed8e922c48e962321; SUB=_2A25wQWorDeRhGeBL7VEU8C7FzT-IHXVTynZjrDV6PUJbkdAKLUSkkW1NRuTODhIq0v9yHOzn6u0MIuKX7yV3GSGe; SUHB=0rr7GeTAheynhT; SSOLoginState=1564809851'''
+    'Cookie': '''换成你自己的 cookie'''
 }
 
 
