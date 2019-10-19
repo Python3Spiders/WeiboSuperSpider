@@ -1,10 +1,3 @@
-# WeiboSuperScrapy
-最强微博爬虫，用户、话题、评论一网打尽。
-
-运行 GUI.py 即可爬取用户/话题微博
-
-运行 WeiboCommentScrapy.py 并修改里面的微博id (wid) 即可爬取指定微博的所有评论。
-
 # 作者简介
 
 
@@ -20,3 +13,10 @@
 <p align="center">
   <img src="qrcode.jpg"></a>
 </p>
+
+# WeiboSuperScrapy
+最强微博爬虫，用户、话题、评论一网打尽。
+
+运行 GUI.py 即可爬取用户/话题微博
+
+运行 WeiboCommentScrapy.py 并修改里面的微博id (wid) 即可爬取指定微博的所有评论。
