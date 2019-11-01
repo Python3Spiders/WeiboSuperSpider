@@ -6,7 +6,7 @@
 |QQ交流群|[861016679](https://jq.qq.com/?_wv=1027&k=5Js6sKS)|
 |个人博客|[https://inspurer.github.io/](https://inspurer.github.io/)|
 
-项目详情请参考微信原文链接：[https://mp.weixin.qq.com/s/d_sJNbnOiEN2pCP2dZbYbw](WeiboCommentScrapy.py)
+项目详情请参考微信原文链接：[https://mp.weixin.qq.com/s/d_sJNbnOiEN2pCP2dZbYbw](https://mp.weixin.qq.com/s/d_sJNbnOiEN2pCP2dZbYbw)
 
 更多精彩请关注公众号，微信扫描下方二维码或者在微信内搜索 **微信公众号：月小水长（ID:inspurer)**；
 
