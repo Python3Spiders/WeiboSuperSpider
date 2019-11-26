@@ -9,6 +9,7 @@
 
 # ff2941
 
+
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, qApp,QListView,QInputDialog,\
     QMessageBox,QProgressDialog,QDialog
 from PyQt5.QtGui import QIcon
@@ -34,13 +35,14 @@ from datetime import datetime, timedelta
 from time import sleep
 
 import requests
+requests.packages.urllib3.disable_warnings()
 from lxml import etree
 
 filter = 1
 
 headers = {
     'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-    'Cookie': '''换成你自己的 cookie'''
+    'Cookie': '''换成你自己的 cookies'''
 }
 
 
@@ -58,11 +60,11 @@ class WeiboSearchScrapy(Thread):
         global ss
         query_data = {
             'keyword': self.keyword,
-            'suser': '找人'
+            'suser': '2'
         }
 
         try:
-            search_response = requests.post(url='https://weibo.cn/search/', headers=self.headers, data=query_data,verify=False)
+            search_response = requests.post(url='https://weibo.cn/find/user', headers=self.headers, data=query_data,verify=False)
 
             search_html = etree.HTML(search_response.text.encode('utf-8'))
 
@@ -954,22 +956,32 @@ class WeiboTopicScrapy(Thread):
 
         global ts
 
-        res = requests.get(url='https://weibo.cn/search/mblog?keyword={}'.format(self.keyword), headers=self.headers,verify=False)
+        data = {
+            'page': 1,
+            'keyword': self.keyword
+        }
 
-        # try:
-        #
-        #     total = html.xpath('/html/body/div[6]/span/text()')[0]
-        # except:
-        #
-        #     total = html.xpath('/html/body/div[5]/span/text()')[0]
+        res = requests.post(url='https://weibo.cn/search/mblog', headers=self.headers, data=data)
+
+        # print(res.text)
+        html = etree.HTML(res.text.encode('utf-8'))
+
+        try:
+
+            total = html.xpath('/html/body/div[6]/span/text()')[0]
+        except:
+
+            total = html.xpath('/html/body/div[5]/span/text()')[0]
         # total = int(total[1:-1])
 
-        total = int(re.findall("共[0-9]*条",res.text)[0][1:-1])
+        total = int(re.findall("共[0-9]*条", res.text)[0][1:-1])
 
         print(total)
-
+        #
+        #
         # 一页十条微博
-        pageNum = 100 if total > 1000 else ceil(total/10)
+        pageNum = 100 if total > 1000 else ceil(total / 10)
+        # pageNum = 100
 
         wrote_num = 0
         page1 = 0
@@ -977,11 +989,12 @@ class WeiboTopicScrapy(Thread):
 
         for page in range(pageNum):
 
+            data = {
+                'page': page + 1,
+                'keyword': self.keyword
+            }
 
-            res = requests.get(url='https://weibo.cn/search/mblog?keyword={}&page={}'.format('香港', page + 1),
-                               headers=headers,verify=False)
-
-            html = etree.HTML(res.text.encode('utf-8'))
+            res = requests.post(url='https://weibo.cn/search/mblog', headers=self.headers, data=data)
 
             try:
                 weibos = html.xpath("//div[@class='c' and @id]")
