@@ -60,13 +60,15 @@ class WeiboSearchScrapy(Thread):
         global ss
         query_data = {
             'keyword': self.keyword,
-            'suser': '2'
+            'suser': '找人'
         }
 
         try:
-            search_response = requests.post(url='https://weibo.cn/find/user', headers=self.headers, data=query_data,verify=False)
+            search_response = requests.post(url='https://weibo.cn/search/?pos=search', headers=self.headers, data=query_data,verify=False)
 
             search_html = etree.HTML(search_response.text.encode('utf-8'))
+
+            print(search_response.text)
 
             tables = search_html.xpath('/html/body/table')  # 返回一个列表
             for i, table in enumerate(tables):
@@ -966,12 +968,14 @@ class WeiboTopicScrapy(Thread):
         # print(res.text)
         html = etree.HTML(res.text.encode('utf-8'))
 
-        try:
-
-            total = html.xpath('/html/body/div[6]/span/text()')[0]
-        except:
-
-            total = html.xpath('/html/body/div[5]/span/text()')[0]
+        print(res.text)
+        #
+        # try:
+        #
+        #     total = html.xpath('/html/body/div[6]/span/text()')[0]
+        # except:
+        #
+        #     total = html.xpath('/html/body/div[5]/span/text()')[0]
         # total = int(total[1:-1])
 
         total = int(re.findall("共[0-9]*条", res.text)[0][1:-1])
@@ -990,11 +994,11 @@ class WeiboTopicScrapy(Thread):
         for page in range(pageNum):
 
             data = {
+                'hideSearchFrame':'',
                 'page': page + 1,
                 'keyword': self.keyword
             }
-
-            res = requests.post(url='https://weibo.cn/search/mblog', headers=self.headers, data=data)
+            res = requests.get(url='https://weibo.cn/search/mblog', headers=self.headers, params=data)
 
             try:
                 weibos = html.xpath("//div[@class='c' and @id]")
