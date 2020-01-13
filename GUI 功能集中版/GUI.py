@@ -17,8 +17,7 @@ from PyQt5.QtCore import (pyqtSignal, QObject,QEvent,Qt)
 
 from MyDialog import MyDialog
 
-from math import ceil
-
+from urllib.parse import quote
 from ListView import ListView,vgs
 import webbrowser
 from threading import Thread
@@ -40,9 +39,12 @@ from lxml import etree
 
 filter = 1
 
+Cookie = '''替换成你自己的 cookie'''
+User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
+
 headers = {
-    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/69.0.3497.100 Safari/537.36',
-    'Cookie': '''换成你自己的 cookies'''
+    'user-agent':User_Agent,
+    'Cookie': Cookie
 }
 
 
@@ -620,12 +622,16 @@ class WeiboUserScrapy(Thread):
 
 class WeiboTopicScrapy(Thread):
 
-    def __init__(self,keyword,filter):
-        global headers
+    def __init__(self,keyword,filter,limit_date):
         Thread.__init__(self)
-        self.headers = headers
+        self.headers={
+            'Cookie':Cookie,
+            'User_Agent':User_Agent
+        }
         self.keyword = keyword
         self.filter = filter # 1: 原创微博； 0：所有微博
+        self.limit_date = limit_date
+        self.flag = True
         self.got_num = 0  # 爬取到的微博数
         self.weibo = []  # 存储爬取到的所有微博信息
         if not os.path.exists('topic'):
@@ -686,7 +692,7 @@ class WeiboTopicScrapy(Thread):
         """获取长转发微博"""
         try:
             wb_content = self.get_long_weibo(weibo_link)
-            weibo_content = wb_content[:wb_content.rfind(u'原文转发')]
+            weibo_content = wb_content[:wb_content.rfind('原文转发')]
             return weibo_content
         except Exception as e:
             print('Error: ', e)
@@ -697,25 +703,24 @@ class WeiboTopicScrapy(Thread):
         try:
             original_user = info.xpath("div/span[@class='cmt']/a/text()")
             if not original_user:
-                wb_content = u'转发微博已被删除'
+                wb_content = '转发微博已被删除'
                 return wb_content
             else:
                 original_user = original_user[0]
             wb_content = self.deal_garbled(info)
             wb_content = wb_content[wb_content.find(':') +
-                                    1:wb_content.rfind(u'赞')]
-            wb_content = wb_content[:wb_content.rfind(u'赞')]
+                                    1:wb_content.rfind('赞')]
+            wb_content = wb_content[:wb_content.rfind('赞')]
             a_text = info.xpath('div//a/text()')
-            print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa',a_text)
-            if u'全文' in a_text:
+            if '全文' in a_text:
                 weibo_link = 'https://weibo.cn/comment/' + weibo_id
                 weibo_content = self.get_long_retweet(weibo_link)
                 if weibo_content:
                     wb_content = weibo_content
             retweet_reason = self.deal_garbled(info.xpath('div')[-1])
-            retweet_reason = retweet_reason[:retweet_reason.rindex(u'赞')]
-            wb_content = (retweet_reason + '\n' + u'原始用户: ' + original_user +
-                          '\n' + u'转发内容: ' + wb_content)
+            retweet_reason = retweet_reason[:retweet_reason.rindex('赞')]
+            wb_content = (retweet_reason + '\n' + '原始用户: ' + original_user +
+                          '\n' + '转发内容: ' + wb_content)
             return wb_content
         except Exception as e:
             print('Error: ', e)
@@ -740,22 +745,22 @@ class WeiboTopicScrapy(Thread):
         try:
             div_first = info.xpath('div')[0]
             a_list = div_first.xpath('a')
-            publish_place = u'无'
+            publish_place = '无'
             for a in a_list:
                 if ('place.weibo.com' in a.xpath('@href')[0]
-                        and a.xpath('text()')[0] == u'显示地图'):
+                        and a.xpath('text()')[0] == '显示地图'):
                     weibo_a = div_first.xpath("span[@class='ctt']/a")
                     if len(weibo_a) >= 1:
                         publish_place = weibo_a[-1]
-                        if (u'视频' == div_first.xpath(
+                        if ('视频' == div_first.xpath(
                                 "span[@class='ctt']/a/text()")[-1][-2:]):
                             if len(weibo_a) >= 2:
                                 publish_place = weibo_a[-2]
                             else:
-                                publish_place = u'无'
+                                publish_place = '无'
                         publish_place = self.deal_garbled(publish_place)
                         break
-            print(u'微博发布位置: ' + publish_place)
+            print('微博发布位置: ' + publish_place)
             return publish_place
         except Exception as e:
             print('Error: ', e)
@@ -766,19 +771,19 @@ class WeiboTopicScrapy(Thread):
         try:
             str_time = info.xpath("div/span[@class='ct']")
             str_time = self.deal_garbled(str_time[0])
-            publish_time = str_time.split(u'来自')[0]
-            if u'刚刚' in publish_time:
+            publish_time = str_time.split('来自')[0]
+            if '刚刚' in publish_time:
                 publish_time = datetime.now().strftime('%Y-%m-%d %H:%M')
-            elif u'分钟' in publish_time:
-                minute = publish_time[:publish_time.find(u'分钟')]
+            elif '分钟' in publish_time:
+                minute = publish_time[:publish_time.find('分钟')]
                 minute = timedelta(minutes=int(minute))
                 publish_time = (datetime.now() -
                                 minute).strftime('%Y-%m-%d %H:%M')
-            elif u'今天' in publish_time:
+            elif '今天' in publish_time:
                 today = datetime.now().strftime('%Y-%m-%d')
                 time = publish_time[3:]
                 publish_time = today + ' ' + time
-            elif u'月' in publish_time:
+            elif '月' in publish_time:
                 year = datetime.now().strftime('%Y')
                 month = publish_time[0:2]
                 day = publish_time[3:5]
@@ -786,7 +791,7 @@ class WeiboTopicScrapy(Thread):
                 publish_time = year + '-' + month + '-' + day + ' ' + time
             else:
                 publish_time = publish_time[:16]
-            print(u'微博发布时间: ' + publish_time)
+            print('微博发布时间: ' + publish_time)
             return publish_time
         except Exception as e:
             print('Error: ', e)
@@ -797,11 +802,11 @@ class WeiboTopicScrapy(Thread):
         try:
             str_time = info.xpath("div/span[@class='ct']")
             str_time = self.deal_garbled(str_time[0])
-            if len(str_time.split(u'来自')) > 1:
+            if len(str_time.split('来自')) > 1:
                 publish_tool = str_time.split(u'来自')[1]
             else:
-                publish_tool = u'无'
-            print(u'微博发布工具: ' + publish_tool)
+                publish_tool = '无'
+            print('微博发布工具: ' + publish_tool)
             return publish_tool
         except Exception as e:
             print('Error: ', e)
@@ -814,19 +819,19 @@ class WeiboTopicScrapy(Thread):
             pattern = r'\d+'
             str_footer = info.xpath('div')[-1]
             str_footer = self.deal_garbled(str_footer)
-            str_footer = str_footer[str_footer.rfind(u'赞'):]
+            str_footer = str_footer[str_footer.rfind('赞'):]
             weibo_footer = re.findall(pattern, str_footer, re.M)
 
             up_num = int(weibo_footer[0])
-            print(u'点赞数: ' + str(up_num))
+            print('点赞数: ' + str(up_num))
             footer['up_num'] = up_num
 
             retweet_num = int(weibo_footer[1])
-            print(u'转发数: ' + str(retweet_num))
+            print('转发数: ' + str(retweet_num))
             footer['retweet_num'] = retweet_num
 
             comment_num = int(weibo_footer[2])
-            print(u'评论数: ' + str(comment_num))
+            print('评论数: ' + str(comment_num))
             footer['comment_num'] = comment_num
             return footer
         except Exception as e:
@@ -855,8 +860,8 @@ class WeiboTopicScrapy(Thread):
                             '/wap180/', '/large/')
                     else:
                         sys.exit(
-                            u"爬虫微博可能被设置成了'不显示图片'，请前往"
-                            u"'https://weibo.cn/account/customize/pic'，修改为'显示'"
+                            "爬虫微博可能被设置成了'不显示图片'，请前往"
+                            "'https://weibo.cn/account/customize/pic'，修改为'显示'"
                         )
             else:
                 picture_urls = '无'
@@ -911,6 +916,8 @@ class WeiboTopicScrapy(Thread):
                     weibo['original'] = is_original  # 是否原创微博
                 weibo['publish_place'] = self.get_publish_place(info)  # 微博发布位置
                 weibo['publish_time'] = self.get_publish_time(info)  # 微博发布时间
+                if weibo['publish_time'][:10]<self.limit_date:
+                    self.flag = False
                 weibo['publish_tool'] = self.get_publish_tool(info)  # 微博发布工具
                 footer = self.get_weibo_footer(info)
                 weibo['up_num'] = footer['up_num']  # 微博点赞数
@@ -939,8 +946,8 @@ class WeiboTopicScrapy(Thread):
                 '评论数',
             ]
             if not self.filter:
-                result_headers.insert(3, '被转发微博原始图片url')
-                result_headers.insert(4, '是否为原创微博')
+                result_headers.insert(4, '被转发微博原始图片url')
+                result_headers.insert(5, '是否为原创微博')
             result_data = [w.values() for w in self.weibo][wrote_num:]
 
             with open('topic/'+self.keyword+'.csv', 'a', encoding='utf-8-sig', newline='') as f:
@@ -956,49 +963,30 @@ class WeiboTopicScrapy(Thread):
 
     def run(self):
 
-        global ts
-
-        data = {
-            'page': 1,
-            'keyword': self.keyword
-        }
-
-        res = requests.post(url='https://weibo.cn/search/mblog', headers=self.headers, data=data)
-
-        # print(res.text)
-        html = etree.HTML(res.text.encode('utf-8'))
-
-        print(res.text)
-        #
-        # try:
-        #
-        #     total = html.xpath('/html/body/div[6]/span/text()')[0]
-        # except:
-        #
-        #     total = html.xpath('/html/body/div[5]/span/text()')[0]
-        # total = int(total[1:-1])
-
-        total = int(re.findall("共[0-9]*条", res.text)[0][1:-1])
-
-        print(total)
-        #
-        #
-        # 一页十条微博
-        pageNum = 100 if total > 1000 else ceil(total / 10)
-        # pageNum = 100
-
         wrote_num = 0
         page1 = 0
         random_pages = random.randint(1, 5)
+        pageNum = 1000000
 
-        for page in range(pageNum):
-
-            data = {
-                'hideSearchFrame':'',
-                'page': page + 1,
-                'keyword': self.keyword
+        for page in range(1, pageNum):
+            if not self.flag:
+                break
+            print('\n\n第{}页....\n'.format(page))
+            Referer = 'https://weibo.cn/search/mblog?hideSearchFrame=&keyword={}&page={}'.format(quote(self.keyword),
+                                                                                                 page - 1)
+            headers = {
+                'Cookie': Cookie,
+                'User-Agent': User_Agent,
+                'Referer': Referer
             }
-            res = requests.get(url='https://weibo.cn/search/mblog', headers=self.headers, params=data)
+            params = {
+                'hideSearchFrame': '',
+                'keyword': self.keyword,
+                'page': page
+            }
+            res = requests.get(url='https://weibo.cn/search/mblog', params=params, headers=headers)
+
+            html = etree.HTML(res.text.encode('utf-8'))
 
             try:
                 weibos = html.xpath("//div[@class='c' and @id]")
@@ -1032,8 +1020,6 @@ class WeiboTopicScrapy(Thread):
             print('共爬取' + str(self.got_num) + '条微博')
         else:
             print('共爬取' + str(self.got_num) + '条原创微博')
-
-        ts.ps.emit("主题【{}】的抓取任务完成".format(self.keyword))
 
 class WBSSignal(QObject):
     ps = pyqtSignal(str)
@@ -1131,7 +1117,7 @@ class ScrapyGUI(QMainWindow):
             group = dialog.getData()
             topic = group[0]
             filter = 1 if group[1] == True else 0
-            WeiboTopicScrapy(keyword=topic,filter=filter)
+            WeiboTopicScrapy(keyword=topic,filter=filter,limit_date='2020-01-01')
             QMessageBox.about(self,"提示","已成功将抓取【{}】主题的任务提交后台,结束会通知您".format(topic))
 
     def aboutAuthor(self):
