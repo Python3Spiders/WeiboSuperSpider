@@ -37,7 +37,7 @@ User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 
 
 class WeiboTopicScrapy(Thread):
 
-    def __init__(self,keyword,filter,limit_date):
+    def __init__(self,keyword,filter,start_time,end_time):
         Thread.__init__(self)
         self.headers={
             'Cookie':Cookie,
@@ -45,8 +45,8 @@ class WeiboTopicScrapy(Thread):
         }
         self.keyword = keyword
         self.filter = filter # 1: 原创微博； 0：所有微博
-        self.limit_date = limit_date
-        self.flag = True
+        self.start_time = start_time
+        self.end_time = end_time
         self.got_num = 0  # 爬取到的微博数
         self.weibo = []  # 存储爬取到的所有微博信息
         if not os.path.exists('topic'):
@@ -331,8 +331,6 @@ class WeiboTopicScrapy(Thread):
                     weibo['original'] = is_original  # 是否原创微博
                 weibo['publish_place'] = self.get_publish_place(info)  # 微博发布位置
                 weibo['publish_time'] = self.get_publish_time(info)  # 微博发布时间
-                if weibo['publish_time'][:10]<self.limit_date:
-                    self.flag = False
                 weibo['publish_tool'] = self.get_publish_tool(info)  # 微博发布工具
                 footer = self.get_weibo_footer(info)
                 weibo['up_num'] = footer['up_num']  # 微博点赞数
@@ -384,8 +382,6 @@ class WeiboTopicScrapy(Thread):
         pageNum = 1000000
 
         for page in range(1, pageNum):
-            if not self.flag:
-                break
             print('\n\n第{}页....\n'.format(page))
             Referer = 'https://weibo.cn/search/mblog?hideSearchFrame=&keyword={}&page={}'.format(quote(self.keyword),
                                                                                                  page - 1)
@@ -397,6 +393,8 @@ class WeiboTopicScrapy(Thread):
             params = {
                 'hideSearchFrame': '',
                 'keyword': self.keyword,
+                'starttime': self.start_time,
+                'endtime': self.end_time,
                 'page': page
             }
             res = requests.get(url='https://weibo.cn/search/mblog', params=params, headers=headers)
@@ -437,9 +435,7 @@ class WeiboTopicScrapy(Thread):
             print('共爬取' + str(self.got_num) + '条原创微博')
 
 if __name__ == '__main__':
-    WeiboTopicScrapy(keyword='中南大学',filter=0,limit_date='2020-01-10')
-
-
+    WeiboTopicScrapy(keyword='巴黎圣母院大火',filter=0,start_time='20190414',end_time='20190515')
 
 
 
