@@ -436,11 +436,3 @@ class WeiboTopicScrapy(Thread):
 
 if __name__ == '__main__':
     WeiboTopicScrapy(keyword='巴黎圣母院大火',filter=0,start_time='20190414',end_time='20190515')
-
-
-
-
-
-
-
-
