@@ -29,4 +29,6 @@
 
 WeiboCommentScrapy.py 爬取评论
 
-WeiboTopicScrapy.py   爬取指定关键词的所有微博，突破了 50 页的限制，可指定~截至日期~时间段搜索
+WeiboTopicScrapy.py   爬取指定关键词的所有微博，突破了 50 页的限制，可指定~截至日期~时间段搜索（比如 20200101-20200102）
+
+WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大
