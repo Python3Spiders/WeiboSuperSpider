@@ -393,8 +393,10 @@ class WeiboTopicScrapy(Thread):
             params = {
                 'hideSearchFrame': '',
                 'keyword': self.keyword,
+                'advancedfilter': '1',
                 'starttime': self.start_time,
                 'endtime': self.end_time,
+                'sort': 'time',
                 'page': page
             }
             res = requests.get(url='https://weibo.cn/search/mblog', params=params, headers=headers)
@@ -435,4 +437,5 @@ class WeiboTopicScrapy(Thread):
             print('共爬取' + str(self.got_num) + '条原创微博')
 
 if __name__ == '__main__':
-    WeiboTopicScrapy(keyword='巴黎圣母院大火',filter=0,start_time='20190414',end_time='20190515')
+    #filter = 0 爬取所有微博，filter = 1 爬取原创微博
+    WeiboTopicScrapy(keyword='益生菌',filter=1,start_time='20190301',end_time='20190701')
