@@ -31,7 +31,8 @@ from datetime import datetime, timedelta
 import sys
 from threading import Thread
 
-Cookie = '''替换成你自己的 cooKie'''
+Cookie = '''改成你自己的cookie'''
+
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
 
@@ -312,6 +313,25 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
+    def get_publisher_info(self, link):
+        response = requests.get(url=link, headers=self.headers)
+        html = self.deal_html(link)
+        user_info = html.xpath('//div[@class="ut"]/span[@class="ctt"]')[0]
+        user_info = user_info.xpath('string(.)').strip()
+        # 去掉  \xa0
+        user_info = ' '.join(user_info.split())
+        kindex = user_info.index(' ')
+        username = user_info[:kindex]
+        sex = user_info[kindex + 1:user_info.index('/')]
+        province = user_info[user_info.index('/') + 1:user_info.rindex(' ')]
+
+        following = html.xpath('//div[@class="tip2"]/a[1]/text()')[0]
+        following = following[3:-1]
+        followd = html.xpath('//div[@class="tip2"]/a[2]/text()')[0]
+        followd = followd[3:-1]
+        # print(link, followd)
+        return username, sex, province, following, followd
+
     def get_one_weibo(self,info):
         """获取一条微博的全部信息"""
         try:
@@ -319,7 +339,12 @@ class WeiboTopicScrapy(Thread):
             is_original = False if len(info.xpath("div/span[@class='cmt']")) > 3 else True
             if (not self.filter) or is_original:
                 weibo['id'] = info.xpath('@id')[0][2:]
-                weibo['publisher'] = info.xpath('div/a/text()')[0]
+                # weibo['publisher'] = info.xpath('div/a/text()')[0]
+                publisher_link = info.xpath('div/a/@href')[0]
+
+                weibo['publisher_name'],weibo['publisher_sex'], weibo['publisher_province'],\
+                    weibo['publisher_following'], weibo['publisher_followed'] = self.get_publisher_info(publisher_link)
+
                 weibo['content'] = self.get_weibo_content(info,
                                                      is_original)  # 微博内容
                 picture_urls = self.get_picture_urls(info, is_original)
@@ -348,7 +373,11 @@ class WeiboTopicScrapy(Thread):
         try:
             result_headers = [
                 '微博id',
-                '发布者',
+                '发布者姓名',
+                '发布者性别',
+                '发布者地区',
+                '发布者关注数'
+                '发布者粉丝数',
                 '微博正文',
                 '原始图片url',
                 '发布位置',
