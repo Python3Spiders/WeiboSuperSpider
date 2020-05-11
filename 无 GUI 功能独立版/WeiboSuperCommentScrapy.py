@@ -7,6 +7,7 @@
 # 微信公众号         月小水长(ID: inspurer)
 
 import time
+import traceback
 import base64
 import rsa
 import binascii
@@ -244,7 +245,7 @@ def info_parser(data):
         'gender':gender
     }
 
-def start_crawl(cookie_dict,id):
+def start_crawl(cookie_dict, id):
     base_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id_type=0'
     next_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id={}&max_id_type={}'
     page = 1
@@ -276,11 +277,15 @@ def start_crawl(cookie_dict,id):
                 for d in wdata:
                     writer.writerow([d['wid'],d['time'],d['text'],d['uid'],d['username'],d['following'],d['followed'],d['gender']])
 
-            time.sleep(3)
+            time.sleep(5)
         except:
+            print(traceback.format_exc())
             print(res.text)
-            id_type += 1
+            print(res.url)
             print('评论总数: {}'.format(comment_count))
+            if id_type==1:
+                break
+            id_type = 1
 
         res = requests.get(url=next_url.format(id, id, max_id,id_type), headers=headers,cookies=cookie_dict)
         requests_count += 1
@@ -289,10 +294,10 @@ def start_crawl(cookie_dict,id):
         print(res.status_code)
 
 if __name__ == '__main__':
-    username = ""  # 用户名（注册的手机号）
-    password = ""  # 密码
+    username = "xxx"  # 用户名，一般是手机号码
+    password = "yyy"  # 密码
     cookie_path = "Cookie.txt"  # 保存cookie 的文件名称
-    id = '4471182638489770'     # 爬取微博的 id
+    id = '4467107636950632'     # 爬取微博的 id
     WeiboLogin(username, password, cookie_path).login()
     with open('{}/{}.csv'.format(comment_path, id), mode='w', encoding='utf-8-sig', newline='') as f:
         writer = csv.writer(f)
