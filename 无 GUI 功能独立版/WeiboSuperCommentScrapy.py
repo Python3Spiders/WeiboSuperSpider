@@ -231,6 +231,7 @@ def get_cookies():
 
 def info_parser(data):
     id,time,text =  data['id'],data['created_at'],data['text']
+    like_count = data['like_count']
     user = data['user']
     uid,username,following,followed,gender = \
         user['id'],user['screen_name'],user['follow_count'],user['followers_count'],user['gender']
@@ -238,7 +239,8 @@ def info_parser(data):
         'wid':id,
         'time':time,
         'text':text,
-        'uid':uid,
+        'uid': uid,
+        'like_count':like_count,
         'username':username,
         'following':following,
         'followed':followed,
@@ -275,7 +277,8 @@ def start_crawl(cookie_dict, id):
             with open('{}/{}.csv'.format(comment_path, id), mode='a+', encoding='utf-8-sig', newline='') as f:
                 writer = csv.writer(f)
                 for d in wdata:
-                    writer.writerow([d['wid'],d['time'],d['text'],d['uid'],d['username'],d['following'],d['followed'],d['gender']])
+                    writer.writerow([d['wid'], d['time'], d['text'], d['uid'], d['like_count'], d['username'],
+                                     d['following'], d['followed'], d['gender']])
 
             time.sleep(5)
         except:
@@ -287,7 +290,7 @@ def start_crawl(cookie_dict, id):
                 break
             id_type = 1
 
-        res = requests.get(url=next_url.format(id, id, max_id,id_type), headers=headers,cookies=cookie_dict)
+        res = requests.get(url=next_url.format(id, id, max_id, id_type), headers=headers,cookies=cookie_dict)
         requests_count += 1
         if requests_count%50==0:
             print(id_type)
@@ -301,5 +304,5 @@ if __name__ == '__main__':
     WeiboLogin(username, password, cookie_path).login()
     with open('{}/{}.csv'.format(comment_path, id), mode='w', encoding='utf-8-sig', newline='') as f:
         writer = csv.writer(f)
-        writer.writerow(['wid', 'time', 'text', 'uid', 'username', 'following', 'followed', 'gender'])
+        writer.writerow(['wid', 'time', 'text', 'uid', 'like_count','username', 'following', 'followed', 'gender'])
     start_crawl(get_cookies(), id)
