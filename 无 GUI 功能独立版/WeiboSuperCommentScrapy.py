@@ -102,9 +102,9 @@ function mid2id(mid) {
     return id;
 }'''
 ctx = execjs.compile(jspython) # 编译 js
-mid = 'Is0XboARR'
-id = ctx.call('mid2id', mid)
-print(id)
+# mid = 'Is0XboARR'
+# id = ctx.call('mid2id', mid)
+# print(id)
 
 class WeiboLogin(object):
     """
@@ -327,7 +327,7 @@ def info_parser(data):
         'gender':gender
     }
 
-def start_crawl(cookie_dict, id, mid):
+def start_crawl(cookie_dict, id):
     base_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id_type=0'
     next_url = 'https://m.weibo.cn/comments/hotflow?id={}&mid={}&max_id={}&max_id_type={}'
     page = 1
@@ -386,14 +386,15 @@ def start_crawl(cookie_dict, id, mid):
             print(id_type)
         print(res.status_code)
 if __name__ == '__main__':
+    global mid
     username = "xxx"  # 用户名，一般是手机号码
     password = "yyy"  # 密码
     cookie_path = "Cookie.txt"  # 保存cookie 的文件名称
-    id = '4467107636950632'     # 爬取微博的 id
-    # mid = 'Is0XboARR'
-    # id = ctx.call('mid2id', mid)
+    # id = '4467107636950632'     # 爬取微博的 id
+    mid = 'Is0XboARR'
+    id = ctx.call('mid2id', mid)
     WeiboLogin(username, password, cookie_path).login()
-    with open('{}/{}.csv'.format(comment_path, id), mode='w', encoding='utf-8-sig', newline='') as f:
+    with open('{}/{}.csv'.format(comment_path, mid), mode='w', encoding='utf-8-sig', newline='') as f:
         writer = csv.writer(f)
         writer.writerow(['wid', 'time', 'text', 'uid', 'like_count','username', 'following', 'followed', 'gender'])
     start_crawl(get_cookies(), id)
