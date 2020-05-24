@@ -311,7 +311,10 @@ def get_cookies():
 
 def info_parser(data):
     id,time,text =  data['id'],data['created_at'],data['text']
-    like_count = data['like_count']
+    try:
+        like_count = data['like_count']
+    except:
+        like_count = '数据缺失'
     user = data['user']
     uid,username,following,followed,gender = \
         user['id'],user['screen_name'],user['follow_count'],user['followers_count'],user['gender']
@@ -391,7 +394,7 @@ if __name__ == '__main__':
     password = "yyy"  # 密码
     cookie_path = "Cookie.txt"  # 保存cookie 的文件名称
     # id = '4467107636950632'     # 爬取微博的 id
-    mid = 'Is0XboARR'
+    mid = 'Ha2zIe2TI'
     id = ctx.call('mid2id', mid)
     WeiboLogin(username, password, cookie_path).login()
     with open('{}/{}.csv'.format(comment_path, mid), mode='w', encoding='utf-8-sig', newline='') as f:
