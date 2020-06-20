@@ -31,7 +31,7 @@ from datetime import datetime, timedelta
 import sys
 from threading import Thread
 
-Cookie = '''改成你自己的cookie'''
+Cookie = '''改成你的 cookie'''
 
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
@@ -255,32 +255,31 @@ class WeiboTopicScrapy(Thread):
             traceback.print_exc()
 
     def extract_picture_urls(self,info, weibo_id):
+        print('开始提取图片 URL')
         """提取微博原始图片url"""
         try:
-            a_list = info.xpath('div/a/@href')
-            first_pic = 'https://weibo.cn/mblog/pic/' + weibo_id + '?rl=0'
+            a_list = info.xpath('./div/a/@href')
             all_pic = 'https://weibo.cn/mblog/picAll/' + weibo_id + '?rl=1'
-            if first_pic in a_list:
-                if all_pic in a_list:
-                    selector = self.deal_html(all_pic)
-                    preview_picture_list = selector.xpath('//img/@src')
-                    picture_list = [
+            if all_pic in a_list:
+                selector = self.deal_html(all_pic)
+                preview_picture_list = selector.xpath('//img/@src')
+                picture_list = [
                         p.replace('/thumb180/', '/large/')
                         for p in preview_picture_list
-                    ]
-                    picture_urls = ','.join(picture_list)
-                else:
-                    if info.xpath('.//img/@src'):
-                        preview_picture = info.xpath('.//img/@src')[-1]
-                        picture_urls = preview_picture.replace(
-                            '/wap180/', '/large/')
-                    else:
-                        sys.exit(
-                            "爬虫微博可能被设置成了'不显示图片'，请前往"
-                            "'https://weibo.cn/account/customize/pic'，修改为'显示'"
-                        )
+                ]
+                picture_urls = ','.join(picture_list)
+                print(picture_urls)
             else:
                 picture_urls = '无'
+                if info.xpath('.//img/@src'):
+                    preview_picture = info.xpath('.//img/@src')[-1]
+                    picture_urls = preview_picture.replace(
+                            '/wap180/', '/large/')
+                else:
+                    sys.exit(
+                            "爬虫微博可能被设置成了'不显示图片'，请前往"
+                            "'https://weibo.cn/account/customize/pic'，修改为'显示'"
+                    )
             return picture_urls
         except Exception as e:
             print('Error: ', e)
@@ -373,7 +372,7 @@ class WeiboTopicScrapy(Thread):
         try:
             result_headers = [
                 '微博id',
-                '发布者姓名',
+                '发布者昵称',
                 '发布者性别',
                 '发布者地区',
                 '发布者关注数',
@@ -447,14 +446,15 @@ class WeiboTopicScrapy(Thread):
                     self.write_csv(wrote_num)
                     wrote_num = self.got_num
 
-
                 # 通过加入随机等待避免被限制。爬虫速度过快容易被系统限制(一段时间后限
                 # 制会自动解除)，加入随机等待模拟人的操作，可降低被系统限制的风险。默
                 # 认是每爬取1到5页随机等待6到10秒，如果仍然被限，可适当增加sleep时间
                 if page - page1 == random_pages and page < pageNum:
                     sleep(random.randint(6, 10))
                     page1 = page
-                    random_pages = random.randint(1, 5)
+                    # random_pages = random.randint(1, 5)
+                    random_pages = random.randint(1, 3)
+
             except:
                 print(res.text)
 
@@ -467,4 +467,5 @@ class WeiboTopicScrapy(Thread):
 
 if __name__ == '__main__':
     #filter = 0 爬取所有微博，filter = 1 爬取原创微博
-    WeiboTopicScrapy(keyword='益生菌',filter=1,start_time='20190301',end_time='20190701')
+    keyword = '北京疫情'
+    WeiboTopicScrapy(keyword=keyword, filter=1, start_time='2020601', end_time='20200620')
