@@ -31,7 +31,7 @@ from datetime import datetime, timedelta
 import sys
 from threading import Thread
 
-Cookie = '''改成你的 cookie'''
+Cookie = '''改成你自己的 cookie'''
 
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
