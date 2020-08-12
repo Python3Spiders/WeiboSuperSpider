@@ -465,10 +465,10 @@ class WeiboUserScrapy():
             user_page_config = 'user_page.json'
             if not os.path.exists('user_page.json'):
                 page = 1
-                with open(user_page_config,'a+', encoding='utf-8-sig') as f:
+                with open(user_page_config,'r', encoding='utf-8-sig') as f:
                     f.write(json.dumps({f'{self.user_id}':page}, indent=2))
             else:
-                with open(user_page_config,'a+', encoding='utf-8-sig') as f:
+                with open(user_page_config,'w', encoding='utf-8-sig') as f:
                     page = json.loads(f.read())[f'{self.user_id}']
 
             random_pages = random.randint(1, 5)
