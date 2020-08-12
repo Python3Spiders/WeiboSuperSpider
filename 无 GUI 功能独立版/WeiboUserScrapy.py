@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # author:           inspurer(月小水长)
 # pc_type           lenovo
-# create_time:      2020/5/24 10:06
+# create_time:      2020/8/12 10:06
 # file_name:        WeiboUserScrapy.py
 # github            https://github.com/inspurer
 # qq邮箱            2391527690@qq.com
@@ -341,38 +341,6 @@ class WeiboUserScrapy():
             print('Error: ', e)
             traceback.print_exc()
 
-    # def extract_picture_urls(self, info, weibo_id):
-    #     """提取微博原始图片url"""
-    #     try:
-    #         a_list = info.xpath('div/a/@href')
-    #         first_pic = 'https://weibo.cn/mblog/pic/' + weibo_id + '?rl=0'
-    #         all_pic = 'https://weibo.cn/mblog/picAll/' + weibo_id + '?rl=1'
-    #         if first_pic in a_list:
-    #             if all_pic in a_list:
-    #                 selector = self.deal_html(all_pic)
-    #                 preview_picture_list = selector.xpath('//img/@src')
-    #                 picture_list = [
-    #                     p.replace('/thumb180/', '/large/')
-    #                     for p in preview_picture_list
-    #                 ]
-    #                 picture_urls = ','.join(picture_list)
-    #             else:
-    #                 if info.xpath('.//img/@src'):
-    #                     preview_picture = info.xpath('.//img/@src')[-1]
-    #                     picture_urls = preview_picture.replace(
-    #                         '/wap180/', '/large/')
-    #                 else:
-    #                     sys.exit(
-    #                         "爬虫微博可能被设置成了'不显示图片'，请前往"
-    #                         "'https://weibo.cn/account/customize/pic'，修改为'显示'"
-    #                     )
-    #         else:
-    #             picture_urls = '无'
-    #         return picture_urls
-    #     except Exception as e:
-    #         print('Error: ', e)
-    #         traceback.print_exc()
-
     def get_picture_urls(self, info, is_original):
         """获取微博原始图片url"""
         try:
@@ -494,25 +462,25 @@ class WeiboUserScrapy():
             page_num = self.get_page_num(selector)  # 获取微博总页数
             wrote_num = 0
             page1 = 0
+            user_page_config = 'user_page.json'
             if not os.path.exists('user_page.json'):
                 page = 1
-                with open('user_page.json','a+', encoding='utf-8-sig') as f:
+                with open(user_page_config,'a+', encoding='utf-8-sig') as f:
                     f.write(json.dumps({f'{self.user_id}':page}, indent=2))
             else:
-                with open('user_page.json','a+', encoding='utf-8-sig') as f:
+                with open(user_page_config,'a+', encoding='utf-8-sig') as f:
                     page = json.loads(f.read())[f'{self.user_id}']
 
             random_pages = random.randint(1, 5)
             for page in range(page, page_num + 1):
                 self.get_one_page(page)  # 获取第page页的全部微博
 
-                with open('user_page.json','r', encoding='utf-8-sig') as f:
+                with open(user_page_config,'r', encoding='utf-8-sig') as f:
                     old_data = json.loads(f.read())
                     old_data[f'{self.user_id}'] = page
 
-                with open('user_page.json','w', encoding='utf-8-sig') as f:
+                with open(user_page_config,'w', encoding='utf-8-sig') as f:
                     f.write(json.dumps(old_data, indent=2))
-
 
                 if page % 3 == 0:  # 每爬3页写入一次文件
                     self.write_file(wrote_num)
