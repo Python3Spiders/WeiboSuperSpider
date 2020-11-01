@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
-# author:           inspurer(月小水长)
-# pc_type           lenovo
-# create_time:      2020/1/12 22:04
-# file_name:        main.py
+# 作者:             inspurer(月小水长)
+# 创建时间:          2020/11/1 17:38
+# 运行环境           Python3.6+
 # github            https://github.com/inspurer
 # qq邮箱            2391527690@qq.com
 # 微信公众号         月小水长(ID: inspurer)
-
+# 文件备注信息       todo
 
 import requests
 
@@ -29,32 +28,29 @@ import os
 
 from datetime import datetime, timedelta
 import sys
-from threading import Thread
 
-Cookie = '''改成你自己的 cookie'''
+Cookie = '改成你自己的 Cookie'
 
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
+class WeiboTopicScrapy():
 
-class WeiboTopicScrapy(Thread):
-
-    def __init__(self,keyword,filter,start_time,end_time):
-        Thread.__init__(self)
-        self.headers={
-            'Cookie':Cookie,
-            'User_Agent':User_Agent
+    def __init__(self, keyword, filter, start_time, end_time):
+        self.headers = {
+            'Cookie': Cookie,
+            'User_Agent': User_Agent
         }
         self.keyword = keyword
-        self.filter = filter # 1: 原创微博； 0：所有微博
-        self.start_time = start_time
-        self.end_time = end_time
+        self.filter = filter  # 1: 原创微博； 0：所有微博
+        self.start_time = time_params_formatter(start_time, offset_hour=-8)
+        self.end_time = time_params_formatter(end_time, offset_day=-1, offset_hour=-8)
         self.got_num = 0  # 爬取到的微博数
         self.weibo = []  # 存储爬取到的所有微博信息
         if not os.path.exists('topic'):
             os.mkdir('topic')
-        self.start()
+        self.run()
 
-    def deal_html(self,url):
+    def deal_html(self, url):
         """处理html"""
         try:
             html = requests.get(url, headers=self.headers).content
@@ -64,7 +60,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def deal_garbled(self,info):
+    def deal_garbled(self, info):
         """处理乱码"""
         try:
             info = (info.xpath('string(.)').replace(u'\u200b', '').encode(
@@ -74,7 +70,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_long_weibo(self,weibo_link):
+    def get_long_weibo(self, weibo_link):
         """获取长原创微博"""
         try:
             selector = self.deal_html(weibo_link)
@@ -88,7 +84,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_original_weibo(self,info, weibo_id):
+    def get_original_weibo(self, info, weibo_id):
         """获取原创微博"""
         try:
             weibo_content = self.deal_garbled(info)
@@ -104,7 +100,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_long_retweet(self,weibo_link):
+    def get_long_retweet(self, weibo_link):
         """获取长转发微博"""
         try:
             wb_content = self.get_long_weibo(weibo_link)
@@ -114,7 +110,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_retweet(self,info, weibo_id):
+    def get_retweet(self, info, weibo_id):
         """获取转发微博"""
         try:
             original_user = info.xpath("div/span[@class='cmt']/a/text()")
@@ -142,7 +138,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_weibo_content(self,info, is_original):
+    def get_weibo_content(self, info, is_original):
         """获取微博内容"""
         try:
             weibo_id = info.xpath('@id')[0][2:]
@@ -156,7 +152,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_publish_place(self,info):
+    def get_publish_place(self, info):
         """获取微博发布位置"""
         try:
             div_first = info.xpath('div')[0]
@@ -182,7 +178,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_publish_time(self,info):
+    def get_publish_time(self, info):
         """获取微博发布时间"""
         try:
             str_time = info.xpath("div/span[@class='ct']")
@@ -213,7 +209,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_publish_tool(self,info):
+    def get_publish_tool(self, info):
         """获取微博发布工具"""
         try:
             str_time = info.xpath("div/span[@class='ct']")
@@ -228,7 +224,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_weibo_footer(self,info):
+    def get_weibo_footer(self, info):
         """获取微博点赞数、转发数、评论数"""
         try:
             footer = {}
@@ -254,7 +250,7 @@ class WeiboTopicScrapy(Thread):
             print('Error: ', e)
             traceback.print_exc()
 
-    def extract_picture_urls(self,info, weibo_id):
+    def extract_picture_urls(self, info, weibo_id):
         print('开始提取图片 URL')
         """提取微博原始图片url"""
         try:
@@ -264,28 +260,29 @@ class WeiboTopicScrapy(Thread):
                 selector = self.deal_html(all_pic)
                 preview_picture_list = selector.xpath('//img/@src')
                 picture_list = [
-                        p.replace('/thumb180/', '/large/')
-                        for p in preview_picture_list
+                    p.replace('/thumb180/', '/large/')
+                    for p in preview_picture_list
                 ]
                 picture_urls = ','.join(picture_list)
                 print(picture_urls)
             else:
                 picture_urls = '无'
-                if info.xpath('.//img/@src'):
-                    preview_picture = info.xpath('.//img/@src')[-1]
-                    picture_urls = preview_picture.replace(
-                            '/wap180/', '/large/')
-                else:
-                    sys.exit(
-                            "爬虫微博可能被设置成了'不显示图片'，请前往"
-                            "'https://weibo.cn/account/customize/pic'，修改为'显示'"
-                    )
+                # return picture_urls
+                # if info.xpath('.//img/@src'):
+                #     preview_picture = info.xpath('.//img/@src')[-1]
+                #     picture_urls = preview_picture.replace(
+                #             '/wap180/', '/large/')
+                # else:
+                #     sys.exit(
+                #             "爬虫微博可能被设置成了'不显示图片'，请前往"
+                #             "'https://weibo.cn/account/customize/pic'，修改为'显示'"
+                #     )
             return picture_urls
         except Exception as e:
             print('Error: ', e)
             traceback.print_exc()
 
-    def get_picture_urls(self,info, is_original):
+    def get_picture_urls(self, info, is_original):
         """获取微博原始图片url"""
         try:
             weibo_id = info.xpath('@id')[0][2:]
@@ -331,7 +328,7 @@ class WeiboTopicScrapy(Thread):
         # print(link, followd)
         return username, sex, province, following, followd
 
-    def get_one_weibo(self,info):
+    def get_one_weibo(self, info):
         """获取一条微博的全部信息"""
         try:
             weibo = OrderedDict()
@@ -341,18 +338,11 @@ class WeiboTopicScrapy(Thread):
                 # weibo['publisher'] = info.xpath('div/a/text()')[0]
                 publisher_link = info.xpath('div/a/@href')[0]
 
-                weibo['publisher_name'],weibo['publisher_sex'], weibo['publisher_province'],\
-                    weibo['publisher_following'], weibo['publisher_followed'] = self.get_publisher_info(publisher_link)
+                weibo['publisher_name'], weibo['publisher_sex'], weibo['publisher_province'], \
+                weibo['publisher_following'], weibo['publisher_followed'] = self.get_publisher_info(publisher_link)
 
                 weibo['content'] = self.get_weibo_content(info,
-                                                     is_original)  # 微博内容
-                picture_urls = self.get_picture_urls(info, is_original)
-                weibo['original_pictures'] = picture_urls[
-                    'original_pictures']  # 原创图片url
-                if not self.filter:
-                    weibo['retweet_pictures'] = picture_urls[
-                        'retweet_pictures']  # 转发图片url
-                    weibo['original'] = is_original  # 是否原创微博
+                                                          is_original)  # 微博内容
                 weibo['publish_place'] = self.get_publish_place(info)  # 微博发布位置
                 weibo['publish_time'] = self.get_publish_time(info)  # 微博发布时间
                 weibo['publish_tool'] = self.get_publish_tool(info)  # 微博发布工具
@@ -360,6 +350,14 @@ class WeiboTopicScrapy(Thread):
                 weibo['up_num'] = footer['up_num']  # 微博点赞数
                 weibo['retweet_num'] = footer['retweet_num']  # 转发数
                 weibo['comment_num'] = footer['comment_num']  # 评论数
+
+                picture_urls = self.get_picture_urls(info, is_original)
+                weibo['original_pictures'] = picture_urls[
+                    'original_pictures']  # 原创图片url
+                if not self.filter:
+                    weibo['retweet_pictures'] = picture_urls[
+                        'retweet_pictures']  # 转发图片url
+                    weibo['original'] = is_original  # 是否原创微博
             else:
                 weibo = None
             return weibo
@@ -391,7 +389,7 @@ class WeiboTopicScrapy(Thread):
                 result_headers.insert(9, '是否为原创微博')
             result_data = [w.values() for w in self.weibo][wrote_num:]
 
-            with open('topic/'+self.keyword+'.csv', 'a', encoding='utf-8-sig', newline='') as f:
+            with open('topic/' + self.keyword + '.csv', 'a', encoding='utf-8-sig', newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
@@ -400,7 +398,6 @@ class WeiboTopicScrapy(Thread):
         except Exception as e:
             print('Error: ', e)
             traceback.print_exc()
-
 
     def run(self):
 
@@ -434,6 +431,11 @@ class WeiboTopicScrapy(Thread):
             try:
                 weibos = html.xpath("//div[@class='c' and @id]")
 
+                # 自动结束
+                if len(weibos) == 0:
+                    print('自动结束，大概率是因为内容爬完了，也请留意是否是 cookie 失效等情况\n')
+                    break
+
                 for i in range(0, len(weibos)):
 
                     aweibo = self.get_one_weibo(info=weibos[i])
@@ -442,7 +444,7 @@ class WeiboTopicScrapy(Thread):
                         self.got_num += 1
                         print('-' * 100)
 
-                if page % 3 == 0 and self.got_num>wrote_num:  # 每爬3页写入一次文件
+                if page % 3 == 0 and self.got_num > wrote_num:  # 每爬3页写入一次文件
                     self.write_csv(wrote_num)
                     wrote_num = self.got_num
 
@@ -456,7 +458,8 @@ class WeiboTopicScrapy(Thread):
                     random_pages = random.randint(1, 3)
 
             except:
-                print(res.text)
+                print(traceback.format_exc())
+                # print(res.text)
 
         if self.got_num > wrote_num:
             self.write_csv(wrote_num)  # 将剩余不足3页的微博写入文件
@@ -465,7 +468,38 @@ class WeiboTopicScrapy(Thread):
         else:
             print('共爬取' + str(self.got_num) + '条原创微博')
 
+
+def get_offset_date(days):
+    # 获取当前时间
+    today = datetime.now()
+    base_day = datetime(year=2016, month=1, day=1)
+    # 计算偏移量
+    offset = timedelta(days=days)
+    # 获取想要的日期的时间
+    res_date = (base_day + offset).strftime('%Y%m%d')
+    return res_date
+
+
+# days = 205
+# WeiboTopicScrapy(keyword=keyword, filter=1, start_time=get_offset_date(days=days), end_time=get_offset_date(days=days+5))
+
+def time_params_formatter(params_time, offset_day=0, offset_hour=-8):
+    [temp_year, temp_month, temp_day, temp_hour] = [int(e) for e in params_time.split('-')]
+    print(temp_year)
+    temp_date = datetime(year=temp_year, month=temp_month, day=temp_day, hour=temp_hour)
+    temp_offset = timedelta(days=offset_day, hours=offset_hour)
+    res_time = (temp_date + temp_offset).strftime('%Y-%m-%d-%H')
+    return res_time
+
+
 if __name__ == '__main__':
-    #filter = 0 爬取所有微博，filter = 1 爬取原创微博
-    keyword = '北京疫情'
-    WeiboTopicScrapy(keyword=keyword, filter=1, start_time='2020601', end_time='20200620')
+    # filter = 0 爬取所有微博，filter = 1 爬取原创微博
+    keyword = 'S10'
+    # 时间是从 start_time 到 end_time 这样
+    # 程序是从 end_time 到 start_time 这样爬
+    # end_time + 1 day + 8 hour
+    # start_time + 8hour
+    start_time, end_time = '2020-10-31-04', '2020-10-31-05'
+    if start_time >= end_time:
+        raise Exception('start_time 是离现在更远的那个时间，必须小于 end_time')
+    WeiboTopicScrapy(keyword=keyword, filter=1, start_time=start_time, end_time=start_time)
