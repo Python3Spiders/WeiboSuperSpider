@@ -43,7 +43,7 @@ class WeiboTopicScrapy():
         self.keyword = keyword
         self.filter = filter  # 1: 原创微博； 0：所有微博
         self.start_time = time_params_formatter(start_time, offset_hour=-8)
-        self.end_time = time_params_formatter(end_time, offset_day=-1, offset_hour=-8)
+        self.end_time = time_params_formatter(end_time, offset_day=-1, offset_hour=-7)
         self.got_num = 0  # 爬取到的微博数
         self.weibo = []  # 存储爬取到的所有微博信息
         if not os.path.exists('topic'):
