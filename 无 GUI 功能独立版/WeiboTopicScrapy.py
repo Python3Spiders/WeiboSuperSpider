@@ -502,4 +502,4 @@ if __name__ == '__main__':
     start_time, end_time = '2020-10-31-04', '2020-10-31-05'
     if start_time >= end_time:
         raise Exception('start_time 是离现在更远的那个时间，必须小于 end_time')
-    WeiboTopicScrapy(keyword=keyword, filter=1, start_time=start_time, end_time=start_time)
+    WeiboTopicScrapy(keyword=keyword, filter=1, start_time=start_time, end_time=end_time)
