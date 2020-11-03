@@ -377,16 +377,16 @@ class WeiboTopicScrapy():
                 '发布者粉丝数',
                 '微博正文',
                 '原始图片url',
-                '发布位置',
                 '发布时间',
                 '发布工具',
                 '点赞数',
                 '转发数',
                 '评论数',
+                '发布位置',
             ]
             if not self.filter:
-                result_headers.insert(8, '被转发微博原始图片url')
-                result_headers.insert(9, '是否为原创微博')
+                result_headers.insert(14, '被转发微博原始图片url')
+                result_headers.insert(15, '是否为原创微博')
             result_data = [w.values() for w in self.weibo][wrote_num:]
 
             with open('topic/' + self.keyword + '.csv', 'a', encoding='utf-8-sig', newline='') as f:
