@@ -437,7 +437,7 @@ class WeiboUserScrapy():
                 result_headers.insert(5, '是否为原创微博')
             result_data = [w.values() for w in self.weibo][wrote_num:]
 
-            with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8-sig',newline='') as f:
+            with open('./user/{}_{}.csv'.format(self.user_id,self.nickname),'a',encoding='utf-8-sig',newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
