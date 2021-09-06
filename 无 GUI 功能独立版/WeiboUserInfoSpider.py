@@ -117,7 +117,7 @@ def dfAddUserInfo(file_path, user_col, user_info_col='user_info'):
         if user_info:
             # 在 user_info 中统一为 user_link
             user_info['user_link'] = user_link
-            df.loc[index, user_info_col] = json.dumps(user_info)
+            df.loc[index, user_info_col] = json.dumps(user_info, ensure_ascii=False)
             sleep(1)
         else:
             print(user_link)
