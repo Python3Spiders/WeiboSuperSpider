@@ -46,6 +46,10 @@ def getUserInfo(uid):
         if not uid:
             return None
     response = requests.get(url=f'https://weibo.com/ajax/profile/detail?uid={uid}', headers=headers)
+    if response.status_code == 400:
+        return {
+            'errorMsg': '用户可能注销或者封号'
+        }
     resp_json = response.json().get('data', None)
     if not resp_json:
         return None
