@@ -107,6 +107,8 @@ def dfAddUserInfo(file_path, user_col, user_info_col='user_info'):
         df[user_info_col] = [user_info_init_value for _ in range(df.shape[0])]
     for index, row in df.iterrows():
         print(f'   {index+1}/{df.shape[0]}   ')
+        if (index+1) % 100 == 0:
+            df.to_csv(file_path, index=False, encoding='utf-8-sig')
         if not row.get(user_info_col, user_info_init_value) is user_info_init_value:
             print('skip')
             continue
