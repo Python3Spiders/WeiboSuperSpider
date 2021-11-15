@@ -26,6 +26,9 @@ import json
 Cookie = '替换你自己weibo.cn的cookie'
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
+if os.path.exists('user'):
+    os.mkdir('user')
+
 
 class WeiboUserScrapy():
 
@@ -91,13 +94,13 @@ class WeiboUserScrapy():
             self.get_nickname()  # 获取用户昵称
             user_info = selector.xpath("//div[@class='tip2']/*/text()")
 
-            self.weibo_num = int(user_info[0][3:-1])
+            self.weibo_num = user_info[0][3:-1]
             print('微博数: ' + str(self.weibo_num))
 
-            self.following = int(user_info[1][3:-1])
+            self.following = user_info[1][3:-1]
             print('关注数: ' + str(self.following))
 
-            self.followers = int(user_info[2][3:-1])
+            self.followers = user_info[2][3:-1]
             print('粉丝数: ' + str(self.followers))
             print('*' * 100)
         except Exception as e:

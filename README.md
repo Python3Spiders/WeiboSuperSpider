@@ -58,12 +58,12 @@
 
 单独的 py 文件分别对立一个 功能
 
-WeiboCommentScrapy.py 爬取评论
+WeiboCommentScrapy.py 爬取评论（2021/11/15 确认失效，可查看公众号新版本）
 
 WeiboTopicScrapy.py   爬取指定关键词的所有微博，突破了 50 页的限制，可指定~截至日期~时间段搜索（比如 20200101-20200102）（20210918 确认已经失效，请使用 [2021 新版微博话题爬虫发布
 ](https://mp.weixin.qq.com/s?__biz=MzUzMDE5MzQ3Ng==&mid=2247484943&idx=1&sn=b1c9520a388171932a9037dbd0ac5460&chksm=fa54cb24cd234232e62bec64881df16bcc1257b3e79628b57d562cd88ae9ffd91b883f15284d&scene=178&cur_album_id=1393531201285226497#rd) 或者公众号里面的免 cookie 版本）
 
-WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大
+WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大（2021/11/15 确认失效，可查看公众号新版本）
 
 
 ## Reference
