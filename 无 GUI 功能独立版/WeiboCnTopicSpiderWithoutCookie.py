@@ -75,7 +75,7 @@ def parse_page(json):
         try:
             topic = json.get('data').get('cardlistInfo').get('cardlist_head_cards')[0]
             topic = topic.get('head_data').get('title')
-            item = item.get('mblog')
+            item = item.get('mblog') if item.get('mblog') else item.get('card_group')[0].get('mblog')
             if item:
                 if item.get('isLongText') is False:  # 不是长文本
                     data = {
