@@ -3,10 +3,10 @@
 
 |作者|[inspurer](https://inspurer.github.io/2018/06/07/%E6%9C%88%E5%B0%8F%E6%B0%B4%E9%95%BF%E7%9A%84%E7%94%B1%E6%9D%A5/#more)|
 |:---:|:---:|
-|QQ交流群|[861016679](https://jq.qq.com/?_wv=1027&k=5Js6sKS)|
+|QQ交流群|[751114777](https://jq.qq.com/?_wv=1027&k=BJI3pLAq)|
 |个人博客|[https://inspurer.github.io/](https://inspurer.github.io/)|
 
-# 2021/7/17 更新
+# 2021/11/25 更新
 
 **2021新版本微博超级爬虫来了**
 
@@ -50,22 +50,19 @@
 
 ## GUI 功能集中版 (discard，请使用独立版本和查看微信公众号)
 
-运行 GUI.py 即可爬取用户/话题微博
+~~运行 GUI.py 即可爬取用户/话题微博~~
 
-运行 WeiboCommentScrapy.py 并修改里面的微博id (wid) 即可爬取指定微博的所有评论。
+~~运行 WeiboCommentScrapy.py 并修改里面的微博id (wid) 即可爬取指定微博的所有评论。~~
 
 ## 无 GUI 功能独立版
 
-单独的 py 文件分别对立一个 功能
+单独的 py 文件分别对立一个 功能，见名知意，或者去公众号中查看详细信息。
 
-WeiboCommentScrapy.py 爬取评论（2021/11/15 确认失效，可查看公众号新版本）
+~~WeiboCommentScrapy.py 爬取评论（2021/11/15 确认失效，可查看公众号新版本）~~
 
-WeiboTopicScrapy.py   爬取指定关键词的所有微博，突破了 50 页的限制，可指定~截至日期~时间段搜索（比如 20200101-20200102）（20210918 确认已经失效，请使用 [2021 新版微博话题爬虫发布
-](https://mp.weixin.qq.com/s?__biz=MzUzMDE5MzQ3Ng==&mid=2247484943&idx=1&sn=b1c9520a388171932a9037dbd0ac5460&chksm=fa54cb24cd234232e62bec64881df16bcc1257b3e79628b57d562cd88ae9ffd91b883f15284d&scene=178&cur_album_id=1393531201285226497#rd) 或者公众号里面的免 cookie 版本）
+~~WeiboTopicScrapy.py   爬取指定关键词的所有微博，突破了 50 页的限制，可指定~截至日期~时间段搜索（比如 20200101-20200102）（20210918 确认已经失效，请使用 [2021 新版微博话题爬虫发布
+](https://mp.weixin.qq.com/s?__biz=MzUzMDE5MzQ3Ng==&mid=2247484943&idx=1&sn=b1c9520a388171932a9037dbd0ac5460&chksm=fa54cb24cd234232e62bec64881df16bcc1257b3e79628b57d562cd88ae9ffd91b883f15284d&scene=178&cur_album_id=1393531201285226497#rd) 或者公众号里面的免 cookie 版本）~~
 
-WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大（2021/11/15 确认失效，可查看公众号新版本）
+~~WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大（2021/11/15 确认失效，可查看公众号新版本）~~
 
-
-## Reference
-
-[https://www.jianshu.com/p/8dc04794e35f](https://www.jianshu.com/p/8dc04794e35f)
+https://www.jianshu.com/p/8dc04794e35f)
