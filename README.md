@@ -46,7 +46,7 @@
 </p>
 
 # WeiboSuperScrapy
-最强微博爬虫，用户、话题、评论一网打尽。
+最强微博爬虫，用户、话题、评论一网打尽。情感分析，地理位置、关系网络等信息应有尽有。
 
 ## GUI 功能集中版 (discard，请使用独立版本和查看微信公众号)
 
@@ -64,5 +64,3 @@
 ](https://mp.weixin.qq.com/s?__biz=MzUzMDE5MzQ3Ng==&mid=2247484943&idx=1&sn=b1c9520a388171932a9037dbd0ac5460&chksm=fa54cb24cd234232e62bec64881df16bcc1257b3e79628b57d562cd88ae9ffd91b883f15284d&scene=178&cur_album_id=1393531201285226497#rd) 或者公众号里面的免 cookie 版本）~~
 
 ~~WeiboSuperCommentScrapy.py 可爬取一条微博的所有评论，更为强大（2021/11/15 确认失效，可查看公众号新版本）~~
-
-https://www.jianshu.com/p/8dc04794e35f)
