@@ -26,7 +26,7 @@ import json
 Cookie = '替换你自己weibo.cn的cookie'
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 
-if os.path.exists('user'):
+if not os.path.exists('user'):
     os.mkdir('user')
 
 
