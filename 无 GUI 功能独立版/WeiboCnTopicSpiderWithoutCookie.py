@@ -90,13 +90,18 @@ def parse_page(json_data):
         if item.get('card_type') == 7:
             print('导语')
             continue
+        elif item.get('card_type') == 8 or (item.get('card_type') == 11 and item.get('card_group') is None):
+            continue
         # topic = json_data.get('data').get('cardlistInfo').get('cardlist_head_cards')[0]
         # # 单独的关键词抓取不是超话，会有 topic == null
         # if topic is None or topic.get('head_data', None) is None:
         #     topic = keyword
         # else:
         #     topic = topic.get('head_data').get('title')
-        item = item.get('mblog') if item.get('mblog') else item.get('card_group')[0].get('mblog')
+        if item.get('mblog', None):
+            item = item.get('mblog')
+        else:
+            item = item.get('card_group')[0].get('mblog')
         if item:
             if item.get('isLongText') is False:  # 不是长文本
                 data = {
