@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
-# author:           inspurer(月小水长)
-# pc_type           lenovo
-# create_time:      2020/8/12 10:06
-# file_name:        WeiboUserScrapy.py
+# 作者:             inspurer(月小水长)
+# 创建时间:          2020/11/1 19:43
+# 运行环境           Python3.6+
 # github            https://github.com/inspurer
 # qq邮箱            2391527690@qq.com
 # 微信公众号         月小水长(ID: inspurer)
+# 文件备注信息       todo
 
 
 import csv
@@ -23,12 +23,10 @@ requests.packages.urllib3.disable_warnings()
 from lxml import etree
 import json
 
-Cookie = '替换你自己weibo.cn的cookie'
+from WeiboConfig import Cookie
+
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
-
-if not os.path.exists('user'):
-    os.mkdir('user')
-
+Cookie = '换成你自己的 cookie, 可以参考：https://www.bilibili.com/video/BV1934y127ZM'
 
 class WeiboUserScrapy():
 
@@ -42,7 +40,7 @@ class WeiboUserScrapy():
         if filter != 0 and filter != 1:
             sys.exit('filter值应为0或1,请重新输入')
 
-        self.user_id = user_id  # 用户id,即需要我们输入的数字,如昵称为"Dear-迪丽热巴"的id为1669879400
+        self.user_id = str(user_id)  # 用户id,即需要我们输入的数字,如昵称为"Dear-迪丽热巴"的id为1669879400
         self.filter = filter  # 取值范围为0、1,程序默认值为0,代表要爬取用户的全部微博,1代表只爬取用户的原创微博
         self.nickname = ''  # 用户昵称,如“Dear-迪丽热巴”
         self.weibo_num = 0  # 用户全部微博数
@@ -50,9 +48,10 @@ class WeiboUserScrapy():
         self.following = 0  # 用户关注数
         self.followers = 0  # 用户粉丝数
         self.weibo = []  # 存储爬取到的所有微博信息
-        self.run()
         if not os.path.exists('user'):
             os.mkdir('user')
+        self.run()
+
 
     def deal_html(self, url):
         """处理html"""
@@ -94,13 +93,13 @@ class WeiboUserScrapy():
             self.get_nickname()  # 获取用户昵称
             user_info = selector.xpath("//div[@class='tip2']/*/text()")
 
-            self.weibo_num = user_info[0][3:-1]
+            self.weibo_num = (user_info[0][3:-1])
             print('微博数: ' + str(self.weibo_num))
 
-            self.following = user_info[1][3:-1]
+            self.following = (user_info[1][3:-1])
             print('关注数: ' + str(self.following))
 
-            self.followers = user_info[2][3:-1]
+            self.followers = (user_info[2][3:-1])
             print('粉丝数: ' + str(self.followers))
             print('*' * 100)
         except Exception as e:
@@ -344,6 +343,38 @@ class WeiboUserScrapy():
             print('Error: ', e)
             traceback.print_exc()
 
+    # def extract_picture_urls(self, info, weibo_id):
+    #     """提取微博原始图片url"""
+    #     try:
+    #         a_list = info.xpath('div/a/@href')
+    #         first_pic = 'https://weibo.cn/mblog/pic/' + weibo_id + '?rl=0'
+    #         all_pic = 'https://weibo.cn/mblog/picAll/' + weibo_id + '?rl=1'
+    #         if first_pic in a_list:
+    #             if all_pic in a_list:
+    #                 selector = self.deal_html(all_pic)
+    #                 preview_picture_list = selector.xpath('//img/@src')
+    #                 picture_list = [
+    #                     p.replace('/thumb180/', '/large/')
+    #                     for p in preview_picture_list
+    #                 ]
+    #                 picture_urls = ','.join(picture_list)
+    #             else:
+    #                 if info.xpath('.//img/@src'):
+    #                     preview_picture = info.xpath('.//img/@src')[-1]
+    #                     picture_urls = preview_picture.replace(
+    #                         '/wap180/', '/large/')
+    #                 else:
+    #                     sys.exit(
+    #                         "爬虫微博可能被设置成了'不显示图片'，请前往"
+    #                         "'https://weibo.cn/account/customize/pic'，修改为'显示'"
+    #                     )
+    #         else:
+    #             picture_urls = '无'
+    #         return picture_urls
+    #     except Exception as e:
+    #         print('Error: ', e)
+    #         traceback.print_exc()
+
     def get_picture_urls(self, info, is_original):
         """获取微博原始图片url"""
         try:
@@ -405,7 +436,7 @@ class WeiboUserScrapy():
     def get_one_page(self, page):
         """获取第page页的全部微博"""
         try:
-            url = 'https://weibo.cn/u/%d?page=%d' % (self.user_id, page)
+            url = f'https://weibo.cn/u/{self.user_id}?page={page}'
             selector = self.deal_html(url)
             info = selector.xpath("//div[@class='c']")
             is_exist = info[0].xpath("div/span[@class='ctt']")
@@ -424,28 +455,29 @@ class WeiboUserScrapy():
         """将爬取的信息写入csv文件"""
         try:
             result_headers = [
-                '微博id',
-                '微博链接',
-                '微博正文',
-                '原始图片url',
-                '发布位置',
-                '发布时间',
-                '发布工具',
-                '点赞数',
-                '转发数',
-                '评论数',
+                'wid',
+                'weibo_link',
+                'content',
+                'img_urls',
+                'location',
+                'publish_time',
+                'publish_tool',
+                'like_num',
+                'forward_num',
+                'comment_num',
             ]
             if not self.filter:
-                result_headers.insert(4, '被转发微博原始图片url')
-                result_headers.insert(5, '是否为原创微博')
+                result_headers.insert(4, 'origin_img_urls')
+                result_headers.insert(5, 'is_origin')
             result_data = [w.values() for w in self.weibo][wrote_num:]
 
+            # with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format_excc(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8-sig',newline='') as f:
             with open('./user/{}_{}.csv'.format(self.user_id,self.nickname),'a',encoding='utf-8-sig',newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
                 writer.writerows(result_data)
-            print(u'%d条微博写入csv文件完毕,保存路径:' % self.got_num)
+            print(u'%d条微博写入csv文件完毕:' % self.got_num)
         except Exception as e:
             print('Error: ', e)
             traceback.print_exc()
@@ -459,7 +491,7 @@ class WeiboUserScrapy():
     def get_weibo_info(self):
         """获取微博信息"""
         try:
-            url = 'https://weibo.cn/u/%d' % (self.user_id)
+            url = f'https://weibo.cn/u/{self.user_id}'
             selector = self.deal_html(url)
             self.get_user_info(selector)  # 获取用户昵称、微博数、关注数、粉丝数
             page_num = self.get_page_num(selector)  # 获取微博总页数
@@ -472,7 +504,11 @@ class WeiboUserScrapy():
                     f.write(json.dumps({f'{self.user_id}':page}, indent=2))
             else:
                 with open(user_page_config,'r', encoding='utf-8-sig') as f:
-                    page = json.loads(f.read())[f'{self.user_id}']
+                    raw_json = json.loads(f.read())
+                    if self.user_id in raw_json.keys():
+                        page = raw_json[self.user_id]
+                    else:
+                        page = 0
 
             random_pages = random.randint(1, 5)
             for page in range(page, page_num + 1):
@@ -484,6 +520,7 @@ class WeiboUserScrapy():
 
                 with open(user_page_config,'w', encoding='utf-8-sig') as f:
                     f.write(json.dumps(old_data, indent=2))
+
 
                 if page % 3 == 0:  # 每爬3页写入一次文件
                     self.write_file(wrote_num)
@@ -517,4 +554,16 @@ class WeiboUserScrapy():
             print(traceback.format_exc())
 
 if __name__ == '__main__':
-    WeiboUserScrapy(user_id=1506711913, filter=0)
+    #  Burberry  ：1924007153
+    #  Coach蔻驰 ：1916986680
+    #  GUCCI     ：1934738161
+    #  DIOR迪奥  ：2130860695
+    #  路易威登   ：1836003984
+    '''
+    1、7314528877_IIHF国际冰球联合会.csv
+    2、7266904393_WCF世界冰壶联合会.csv
+    3、7510734946_国际雪车联合会.csv
+    4、5980037952_北京2022年冬奥会.csv
+    5、1854869497_奥林匹克运动会.csv
+    '''
+    WeiboUserScrapy(user_id=2541980464, filter=0)
