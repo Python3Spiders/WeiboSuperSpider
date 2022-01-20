@@ -324,7 +324,7 @@ class WeiboUserScrapy():
                     p.replace('/thumb180/', '/large/')
                     for p in preview_picture_list
                 ]
-                picture_urls = ','.join(picture_list)
+                picture_urls = ' '.join(picture_list)
                 print(picture_urls)
             else:
                 picture_urls = '无'
@@ -554,16 +554,4 @@ class WeiboUserScrapy():
             print(traceback.format_exc())
 
 if __name__ == '__main__':
-    #  Burberry  ：1924007153
-    #  Coach蔻驰 ：1916986680
-    #  GUCCI     ：1934738161
-    #  DIOR迪奥  ：2130860695
-    #  路易威登   ：1836003984
-    '''
-    1、7314528877_IIHF国际冰球联合会.csv
-    2、7266904393_WCF世界冰壶联合会.csv
-    3、7510734946_国际雪车联合会.csv
-    4、5980037952_北京2022年冬奥会.csv
-    5、1854869497_奥林匹克运动会.csv
-    '''
     WeiboUserScrapy(user_id=2541980464, filter=0)
