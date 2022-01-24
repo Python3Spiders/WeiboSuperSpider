@@ -23,8 +23,6 @@ requests.packages.urllib3.disable_warnings()
 from lxml import etree
 import json
 
-from WeiboConfig import Cookie
-
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 Cookie = '换成你自己的 cookie, 可以参考：https://www.bilibili.com/video/BV1934y127ZM'
 
