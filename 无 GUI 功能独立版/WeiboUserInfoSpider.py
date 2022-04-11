@@ -109,10 +109,11 @@ def dfAddUserInfo(file_path, user_col, user_info_col='user_info'):
         print(f'   {index+1}/{df.shape[0]}   ')
         if (index+1) % 100 == 0:
             df.to_csv(file_path, index=False, encoding='utf-8-sig')
-        if not row.get(user_info_col, user_info_init_value) is user_info_init_value:
+        if not row.get(user_info_col, user_info_init_value) == user_info_init_value:
             print('skip')
             continue
         user_link = row[user_col]
+        user_link = user_link[:user_link.rindex('?')]
         user_id = user_link[user_link.rindex('/')+1:]
         user_info = getUserInfo(user_id)
         print(user_info)
@@ -124,7 +125,7 @@ def dfAddUserInfo(file_path, user_col, user_info_col='user_info'):
         else:
             print(user_link)
             break
-    df.to_csv(file_path, index=False, encoding='utf-8-sig')
+        df.to_csv(file_path, index=False, encoding='utf-8-sig')
 
 '''
 从已经加好 userinfo 的 df 里遍历 userinfo 
