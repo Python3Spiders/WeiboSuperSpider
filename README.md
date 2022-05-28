@@ -13,6 +13,19 @@
 |QQ交流群|[751114777](https://jq.qq.com/?_wv=1027&k=BJI3pLAq)|
 |个人博客|[https://inspurer.github.io/](https://inspurer.github.io/)|
 
+If you use this project in your research, please cite this project.
+
+```
+@misc{WeiboSuperSpider,
+    author = {Tao Xiao},
+    title = {微博超级爬虫，最强微博爬虫，用户、话题、评论一网打尽。图片下载、情感分析，地理位置、关系网络等功能应有尽有。},
+    year = {2019},
+    publisher = {GitHub},
+    journal = {GitHub repository},
+    howpublished = {\url{https://github.com/Python3Spiders/WeiboSuperSpider}},
+}
+```
+
 # 2021/11/25 更新
 
 **2021新版本微博超级爬虫来了**
