@@ -59,7 +59,7 @@ def getUserLinkByName(name):
 import pandas as pd
 
 
-def dfAddUserLink(file_path, user_name_cloumn, user_link_column='user_link', finish_column='finish'):
+def dfAddUserLink(file_path, user_name_column, user_link_column='user_link', finish_column='finish'):
     df = pd.read_csv(file_path)
     if not finish_column in df.columns.values.tolist():
         df[finish_column] = [False for _ in range(df.shape[0])]
