@@ -73,7 +73,7 @@ def dfAddUserLink(file_path, user_name_column, user_link_column='user_link', fin
         if row[finish_column] == True:
             continue
 
-        uid = getUidByName(row[user_name_cloumn])
+        uid = getUidByName(row[user_name_column])
         if uid == -1:
             consist += 1
             if consist >= consist_limit:
