@@ -1,28 +1,25 @@
-# 2022 最新指南
+### 2022 最新指南
 
 [https://buyixiao.github.io/blog/weibo-super-spider.html](https://buyixiao.github.io/blog/weibo-super-spider.html)
 
-# 配套的自助抓取网站
+### 配套的自助抓取网站（顺带任意深度和广度的微博用户关系（关注/粉丝）网络构建、任意深度和广度的微博转发路径网络、微博、评论、签到等数据集在线构建）
 
-[execute data crawling without any environment setting](https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzUzMDE5MzQ3Ng==&action=getalbum&album_id=2441746336438894594&scene=173&from_msgid=2247485809&from_itemidx=1&count=3&nolastread=1#wechat_redirect)
+[execute data crawling without any environment setting](https://weibo-crawl-visual.buyixiao.xyz/)
 
-# 配套的微博可视化网站
+### 配套的微博可视化网站
 
 [https://buyixiao.github.io/blog/one-stop-weibo-visualization.html](https://buyixiao.github.io/blog/one-stop-weibo-visualization.html)
 
-## 任意深度和广度的微博用户关系（关注/粉丝）网络构建网站
+### 包含世界、中国-省-市地图和动态排序柱状图、桑基图、关系图、弦图、旭日图、树图、矩形树图等图表在线配置数据可视化工具网站
 
-[https://weibo-user-network.buyixiao.xyz/](https://weibo-user-network.buyixiao.xyz/)
+[https://tools.buyixiao.xyz/](https://tools.buyixiao.xyz/)
 
-## 任意深度和广度的微博转发路径网络构建网站
 
-[https://weibo-layer-repost.buyixiao.xyz/](https://weibo-layer-repost.buyixiao.xyz/)
-
-## 微博签到相关可视化、B 站教程
+### 微博签到相关可视化、B 站教程
 
 [https://www.bilibili.com/video/BV1S14y1x73y](https://www.bilibili.com/video/BV1S14y1x73y)
 
-# 作者简介
+### 作者简介
 
 |作者|[inspurer](https://inspurer.github.io/2018/06/07/%E6%9C%88%E5%B0%8F%E6%B0%B4%E9%95%BF%E7%9A%84%E7%94%B1%E6%9D%A5/#more)|
 |:---:|:---:|
