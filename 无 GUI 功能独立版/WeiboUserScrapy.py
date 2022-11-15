@@ -17,8 +17,10 @@ import traceback
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from time import sleep
+import pandas as pd
 
 import requests
+
 requests.packages.urllib3.disable_warnings()
 from lxml import etree
 import json
@@ -26,13 +28,14 @@ import json
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
 Cookie = '换成你自己的 cookie, 可以参考：https://www.bilibili.com/video/BV1934y127ZM'
 
+
 class WeiboUserScrapy():
 
     def __init__(self, user_id, filter=0):
         global headers
         self.headers = {
-            'Cookie':Cookie,
-            'User_Agent':User_Agent
+            'Cookie': Cookie,
+            'User_Agent': User_Agent
         }
 
         if filter != 0 and filter != 1:
@@ -50,11 +53,10 @@ class WeiboUserScrapy():
             os.mkdir('user')
         self.run()
 
-
     def deal_html(self, url):
         """处理html"""
         try:
-            html = requests.get(url, headers=self.headers,verify=False).content
+            html = requests.get(url, headers=self.headers, verify=False).content
             selector = etree.HTML(html)
             return selector
         except Exception as e:
@@ -449,6 +451,17 @@ class WeiboUserScrapy():
             print('Error: ', e)
             traceback.print_exc()
 
+    @staticmethod
+    def drop_duplicate(file_path):
+        df = pd.read_csv(file_path)
+        # print(df.shape[0])
+        df.drop_duplicates(keep='first', subset=['wid'], inplace=True)
+        # 去重重复 header
+        df.drop(df[df['publish_time'].isin(['publish_time'])].index, inplace=True)
+        # print(df.shape[0])
+        df.sort_values(by=['publish_time'], ascending=False, inplace=True)
+        df.to_csv(file_path, index=False, encoding='utf-8-sig')
+
     def write_csv(self, wrote_num):
         """将爬取的信息写入csv文件"""
         try:
@@ -468,18 +481,19 @@ class WeiboUserScrapy():
                 result_headers.insert(4, 'origin_img_urls')
                 result_headers.insert(5, 'is_origin')
             result_data = [w.values() for w in self.weibo][wrote_num:]
-
+            file_path = './user/{}_{}.csv'.format(self.user_id, self.nickname)
             # with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format_excc(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8-sig',newline='') as f:
-            with open('./user/{}_{}.csv'.format(self.user_id,self.nickname),'a',encoding='utf-8-sig',newline='') as f:
+            with open(file_path, 'a', encoding='utf-8-sig', newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
                 writer.writerows(result_data)
+            self.drop_duplicate(file_path)
             print(u'%d条微博写入csv文件完毕:' % self.got_num)
+
         except Exception as e:
             print('Error: ', e)
             traceback.print_exc()
-
 
     def write_file(self, wrote_num):
         """写文件"""
@@ -498,10 +512,10 @@ class WeiboUserScrapy():
             user_page_config = 'user_page.json'
             if not os.path.exists('user_page.json'):
                 page = 1
-                with open(user_page_config,'w', encoding='utf-8-sig') as f:
-                    f.write(json.dumps({f'{self.user_id}':page}, indent=2))
+                with open(user_page_config, 'w', encoding='utf-8-sig') as f:
+                    f.write(json.dumps({f'{self.user_id}': page}, indent=2))
             else:
-                with open(user_page_config,'r', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'r', encoding='utf-8-sig') as f:
                     raw_json = json.loads(f.read())
                     if self.user_id in raw_json.keys():
                         page = raw_json[self.user_id]
@@ -512,13 +526,12 @@ class WeiboUserScrapy():
             for page in range(page, page_num + 1):
                 self.get_one_page(page)  # 获取第page页的全部微博
 
-                with open(user_page_config,'r', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'r', encoding='utf-8-sig') as f:
                     old_data = json.loads(f.read())
                     old_data[f'{self.user_id}'] = page
 
-                with open(user_page_config,'w', encoding='utf-8-sig') as f:
+                with open(user_page_config, 'w', encoding='utf-8-sig') as f:
                     f.write(json.dumps(old_data, indent=2))
-
 
                 if page % 3 == 0:  # 每爬3页写入一次文件
                     self.write_file(wrote_num)
@@ -550,6 +563,7 @@ class WeiboUserScrapy():
         except Exception as e:
             print('Error: ', e)
             print(traceback.format_exc())
+
 
 if __name__ == '__main__':
     WeiboUserScrapy(user_id=2541980464, filter=0)
