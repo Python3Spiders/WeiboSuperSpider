@@ -26,12 +26,14 @@ from lxml import etree
 import json
 
 User_Agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0'
-Cookie = '换成你自己的 cookie, 可以参考：https://www.bilibili.com/video/BV1934y127ZM'
+Cookie = '换成你自己的 cookie, 可以参考：https://www.bilibili.com/video/BV1934y127ZM  感谢 @Simon_阿文 写的入门级食用教程：https://weibo.com/1757693565/Mswzx0UEy'
 
 
 class WeiboUserScrapy():
+    IMG_LINK_SEP = ' '
+    IMG_SAVE_ROOT = 'img'
 
-    def __init__(self, user_id, filter=0):
+    def __init__(self, user_id, filter=0, download_img=False):
         global headers
         self.headers = {
             'Cookie': Cookie,
@@ -43,6 +45,7 @@ class WeiboUserScrapy():
 
         self.user_id = str(user_id)  # 用户id,即需要我们输入的数字,如昵称为"Dear-迪丽热巴"的id为1669879400
         self.filter = filter  # 取值范围为0、1,程序默认值为0,代表要爬取用户的全部微博,1代表只爬取用户的原创微博
+        self.download_img = download_img  # 微博抓取結束后是否下载微博图片
         self.nickname = ''  # 用户昵称,如“Dear-迪丽热巴”
         self.weibo_num = 0  # 用户全部微博数
         self.got_num = 0  # 爬取到的微博数
@@ -51,6 +54,12 @@ class WeiboUserScrapy():
         self.weibo = []  # 存储爬取到的所有微博信息
         if not os.path.exists('user'):
             os.mkdir('user')
+        if not os.path.exists(self.IMG_SAVE_ROOT):
+            os.mkdir(self.IMG_SAVE_ROOT)
+        if self.download_img:
+            self.img_save_folder = os.path.join(self.IMG_SAVE_ROOT, self.user_id)
+            if not os.path.exists(self.img_save_folder):
+                os.mkdir(self.img_save_folder)
         self.run()
 
     def deal_html(self, url):
@@ -311,69 +320,19 @@ class WeiboUserScrapy():
         print('开始提取图片 URL')
         """提取微博原始图片url"""
         try:
-            a_list = info.xpath('./div/a/@href')
-            # first_pic = 'https://weibo.cn/mblog/pic/' + weibo_id + '?rl=0'
-            all_pic = 'https://weibo.cn/mblog/picAll/' + weibo_id + '?rl=1'
-            # print('alist', a_list, all_pic)
-            # lll = info.xpath('./div[2]/a[1]/@href')
-            # if lll==:#first_pic in a_list:
-            if all_pic in a_list:
-                selector = self.deal_html(all_pic)
-                preview_picture_list = selector.xpath('//img/@src')
-                picture_list = [
-                    p.replace('/thumb180/', '/large/')
-                    for p in preview_picture_list
-                ]
-                picture_urls = ' '.join(picture_list)
-                print(picture_urls)
-            else:
-                picture_urls = '无'
-                if info.xpath('.//img/@src'):
-                    preview_picture = info.xpath('.//img/@src')[-1]
-                    picture_urls = preview_picture.replace(
-                        '/wap180/', '/large/')
-                else:
-                    print(traceback.format_exc())
-                    # sys.exit(
-                    #     "爬虫微博可能被设置成了'不显示图片'，请前往"
-                    #     "'https://weibo.cn/account/customize/pic'，修改为'显示'"
-                    # )
+            selector = self.deal_html(f"https://weibo.cn/mblog/picAll/{weibo_id}?rl=2")
+            sleep(1)
+            picture_list = selector.xpath('//img/@src')
+            picture_list = [
+                p.replace('/thumb180/', '/large/').replace('/wap180/', '/large/')
+                for p in picture_list
+            ]
+            print(picture_list)
+            picture_urls = self.IMG_LINK_SEP.join(picture_list)
             return picture_urls
         except Exception as e:
             print('Error: ', e)
             traceback.print_exc()
-
-    # def extract_picture_urls(self, info, weibo_id):
-    #     """提取微博原始图片url"""
-    #     try:
-    #         a_list = info.xpath('div/a/@href')
-    #         first_pic = 'https://weibo.cn/mblog/pic/' + weibo_id + '?rl=0'
-    #         all_pic = 'https://weibo.cn/mblog/picAll/' + weibo_id + '?rl=1'
-    #         if first_pic in a_list:
-    #             if all_pic in a_list:
-    #                 selector = self.deal_html(all_pic)
-    #                 preview_picture_list = selector.xpath('//img/@src')
-    #                 picture_list = [
-    #                     p.replace('/thumb180/', '/large/')
-    #                     for p in preview_picture_list
-    #                 ]
-    #                 picture_urls = ','.join(picture_list)
-    #             else:
-    #                 if info.xpath('.//img/@src'):
-    #                     preview_picture = info.xpath('.//img/@src')[-1]
-    #                     picture_urls = preview_picture.replace(
-    #                         '/wap180/', '/large/')
-    #                 else:
-    #                     sys.exit(
-    #                         "爬虫微博可能被设置成了'不显示图片'，请前往"
-    #                         "'https://weibo.cn/account/customize/pic'，修改为'显示'"
-    #                     )
-    #         else:
-    #             picture_urls = '无'
-    #         return picture_urls
-    #     except Exception as e:
-    #         print('Error: ', e)
-    #         traceback.print_exc()
 
     def get_picture_urls(self, info, is_original):
         """获取微博原始图片url"""
@@ -436,12 +395,12 @@ class WeiboUserScrapy():
     def get_one_page(self, page):
         """获取第page页的全部微博"""
         try:
-            url = f'https://weibo.cn/u/{self.user_id}?page={page}'
+            url = f'https://weibo.cn/{self.user_id}/profile?page={page}'
             selector = self.deal_html(url)
             info = selector.xpath("//div[@class='c']")
             is_exist = info[0].xpath("div/span[@class='ctt']")
             if is_exist:
-                for i in range(0, len(info) - 2):
+                for i in range(0, len(info) - 1):
                     weibo = self.get_one_weibo(info[i])
                     if weibo:
                         self.weibo.append(weibo)
@@ -481,14 +440,14 @@ class WeiboUserScrapy():
                 result_headers.insert(4, 'origin_img_urls')
                 result_headers.insert(5, 'is_origin')
             result_data = [w.values() for w in self.weibo][wrote_num:]
-            file_path = './user/{}_{}.csv'.format(self.user_id, self.nickname)
+            self.file_path = './user/{}_{}.csv'.format(self.user_id, self.nickname)
             # with open('./user/{}_{}_{}博_{}粉_{}关注.csv'.format_excc(self.user_id,self.nickname,self.weibo_num, self.followers,self.following),'a',encoding='utf-8-sig',newline='') as f:
-            with open(file_path, 'a', encoding='utf-8-sig', newline='') as f:
+            with open(self.file_path, 'a', encoding='utf-8-sig', newline='') as f:
                 writer = csv.writer(f)
                 if wrote_num == 0:
                     writer.writerows([result_headers])
                 writer.writerows(result_data)
-            self.drop_duplicate(file_path)
+            self.drop_duplicate(self.file_path)
             print(u'%d条微博写入csv文件完毕:' % self.got_num)
 
         except Exception as e:
@@ -503,7 +462,7 @@ class WeiboUserScrapy():
     def get_weibo_info(self):
         """获取微博信息"""
         try:
-            url = f'https://weibo.cn/u/{self.user_id}'
+            url = f'https://weibo.cn/{self.user_id}/profile'
             selector = self.deal_html(url)
             self.get_user_info(selector)  # 获取用户昵称、微博数、关注数、粉丝数
             page_num = self.get_page_num(selector)  # 获取微博总页数
@@ -553,11 +512,42 @@ class WeiboUserScrapy():
             print('Error: ', e)
             traceback.print_exc()
 
-    def run(self):
-        """运行爬虫"""
+    def do_down_img(self, img_url, savepath):
+        if os.path.exists(savepath):
+            print(f'{img_url} 已经下载过')
+            return
         try:
+            print(f"正在下载图片 {img_url} ...")
+            with open(savepath, 'wb') as fp:
+                response = requests.get(url=img_url, headers=self.headers)
+                fp.write(response.content)
+            print('图片下载成功')
+            sleep(1)
+        except:
+            print('图片下载失败')
+
+    def get_weibo_img(self):
+        '''下载相册图片'''
+        if self.download_img:
+            df = pd.read_csv(self.file_path)
+            for index, row in df.iterrows():
+                print(f'index: {index + 1} / {df.shape[0]}')
+                image_urls = row['img_urls']
+                wid = row['wid']
+                if image_urls == None or isinstance(image_urls, float) or image_urls == '' or image_urls == '无':
+                    pass
+                else:
+                    image_urls = image_urls.split(self.IMG_LINK_SEP)
+                    for index, image_url in enumerate(image_urls):
+                        self.do_down_img(image_url, os.path.join(self.img_save_folder, f'{wid}_{index + 1}.jpg'))
+
+    def run(self):
+        """运行爬虫 """
+        try:
+            print('开始抓取微博')
             self.get_weibo_info()
-            print('信息抓取完毕')
+            print('微博抓取完毕，开始下载相册图片')
+            self.get_weibo_img()
             print('*' * 100)
 
         except Exception as e:
@@ -566,4 +556,9 @@ class WeiboUserScrapy():
 
 
 if __name__ == '__main__':
-    WeiboUserScrapy(user_id=2541980464, filter=0)
+    # 注意关闭 vpn
+    # 2023.2.11 更新
+    # 1、解决抓取自己的微博時，抓取的是关注人的微博的问题
+    # 2、解决微博抓取不全的问题
+    # 3、可选下载所有图片，参数为 download_img，默认为 False 不下载
+    WeiboUserScrapy(user_id=6859133019, filter=0, download_img=True)
