@@ -150,6 +150,7 @@ class WeiboUserScrapy():
             a_text = info.xpath('div//a/text()')
             if '全文' in a_text:
                 weibo_link = 'https://weibo.cn/comment/' + weibo_id
+                sleep(2)
                 wb_content = self.get_long_weibo(weibo_link)
                 if wb_content:
                     weibo_content = wb_content
@@ -532,14 +533,23 @@ class WeiboUserScrapy():
             df = pd.read_csv(self.file_path)
             for index, row in df.iterrows():
                 print(f'index: {index + 1} / {df.shape[0]}')
-                image_urls = row['img_urls']
+                # 下载相册图片使用 img_urls
+                # 下载转发过的微博里面的图片使用 origin_img_urls
+
+                image_cols = ['img_urls']
+                if not self.filter:
+                    image_cols.append('origin_img_urls')
+
                 wid = row['wid']
-                if image_urls == None or isinstance(image_urls, float) or image_urls == '' or image_urls == '无':
-                    pass
-                else:
-                    image_urls = image_urls.split(self.IMG_LINK_SEP)
-                    for index, image_url in enumerate(image_urls):
-                        self.do_down_img(image_url, os.path.join(self.img_save_folder, f'{wid}_{index + 1}.jpg'))
+
+                for ic in image_cols:
+                    image_urls = row[ic]
+                    if image_urls == None or isinstance(image_urls, float) or image_urls == '' or image_urls == '无':
+                        pass
+                    else:
+                        image_urls = image_urls.split(self.IMG_LINK_SEP)
+                        for index, image_url in enumerate(image_urls):
+                            self.do_down_img(image_url, os.path.join(self.img_save_folder, f'{wid}_{ic[:-5]}_{index + 1}.jpg'))
 
     def run(self):
         """运行爬虫 """
@@ -556,9 +566,9 @@ class WeiboUserScrapy():
 
 
 if __name__ == '__main__':
-    # 注意关闭 vpn
-    # 2023.2.11 更新
-    # 1、解决抓取自己的微博時，抓取的是关注人的微博的问题
-    # 2、解决微博抓取不全的问题
-    # 3、可选下载所有图片，参数为 download_img，默认为 False 不下载
+    # 注意关闭 vpn，注意配置代码第 29 行处的 cookie
+    # 2023.2.12 更新
+    # 1、解决无法抓取 cookie 对应账号微博的问题
+    # 2、解决微博抓取不全的问题，解决微博全文无法获取的问题（有待多次验证）
+    # 3、可选下载所有图片（包括微博相册和转发微博里面的图片），参数为 download_img，默认为 False 不下载
     WeiboUserScrapy(user_id=6859133019, filter=0, download_img=True)
