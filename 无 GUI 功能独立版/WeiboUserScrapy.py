@@ -322,6 +322,8 @@ class WeiboUserScrapy():
         """提取微博原始图片url"""
         try:
             selector = self.deal_html(f"https://weibo.cn/mblog/picAll/{weibo_id}?rl=2")
+            if not selector:
+                return ''
             sleep(1)
             picture_list = selector.xpath('//img/@src')
             picture_list = [
