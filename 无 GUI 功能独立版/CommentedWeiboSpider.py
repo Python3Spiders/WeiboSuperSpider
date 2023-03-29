@@ -5,9 +5,9 @@
 # github            https://github.com/inspurer
 # website           https://buyixiao.github.io/
 # 微信公众号         月小水长
-​
+
 import requests
-​
+
 headers = {
     'authority': 'weibo.com',
     'accept': 'application/json, text/plain, */*',
@@ -25,19 +25,19 @@ headers = {
     'x-requested-with': 'XMLHttpRequest',
 }
 from time import sleep
-​
+
 slp_sec_per_req = 8
-​
+
 import traceback
 from datetime import datetime
-​
-​
+
+
 def time_formater(input_time_str):
     input_format = '%a %b %d %H:%M:%S %z %Y'
     output_format = '%Y-%m-%d %H:%M:%S'
     return datetime.strptime(input_time_str, input_format).strftime(output_format)
-​
-​
+
+
 def getLongText(mid):
     params = {
         'ajwvr': '6',
@@ -56,8 +56,8 @@ def getLongText(mid):
     except:
         print(traceback.format_exc())
         return None
-​
-​
+
+
 def extract_video_url(a_weibo):
     page_info = a_weibo.get('page_info', None)
     if page_info:
@@ -71,16 +71,16 @@ def extract_video_url(a_weibo):
                 print(media_info)
                 sleep(10)
     return None
-​
-​
+
+
 import pandas as pd
 import os
-​
+
 save_folder = 'user'
 if not os.path.exists(save_folder):
     os.mkdir(save_folder)
-​
-​
+
+
 def get_commented_weibo_by_uid(uid, cookie=None):
     if cookie:
         headers['cookie'] = cookie
@@ -97,7 +97,7 @@ def get_commented_weibo_by_uid(uid, cookie=None):
     cols = ['typ', 'mid', 'publish_time', 'uid', 'screen_name', 'verified_type', 'weibo_link', 'text',
             'image_urls', 'video_url', 'region_name',
             'reposts_count', 'comments_count', 'attitudes_count']
-​
+
     df = pd.DataFrame({key: [] for key in cols})
     while True:
         response = requests.get('https://weibo.com/ajax/statuses/mymblog', params=params, headers=headers)
@@ -110,7 +110,7 @@ def get_commented_weibo_by_uid(uid, cookie=None):
             print(response.url, resp_json)
             print('\n\n data list is 0')
             break
-​
+
         for item in data:
             title = item.get('title', None)
             typ = None
@@ -129,45 +129,45 @@ def get_commented_weibo_by_uid(uid, cookie=None):
                 if item['user'] == None:
                     print(item['text_raw'])
                     continue
-​
+
             if not typ:
                 continue
-​
+
             # print(typ, item)
-​
+
             mid = item['mid']
             user = item['user']
-​
+
             publish_time = time_formater(item['created_at'])
-​
+
             uid = user['idstr']
             screen_name = user['screen_name']
             verified_type = user['verified_type']
-​
+
             weibo_link = f'https://weibo.com/{uid}/{item.get("mblogid")}'
-​
+
             text = item['text_raw']
             if item.get('isLongText') == True and publish_time >= '2012':
                 sleep(slp_sec_per_req // 2 + 1)
                 re_text = getLongText(mid)
                 if re_text:
                     text = re_text
-​
+
             pic_ids = item.get('pic_ids', None)
             image_urls = []
             if pic_ids:
                 for pic_id in pic_ids:
                     image_urls.append(f'https://wx1.sinaimg.cn/large/{pic_id}.jpg')
             image_urls = ' '.join(image_urls)
-​
+
             video_url = extract_video_url(item)
-​
+
             region_name = item.get('region_name', None)
-​
+
             reposts_count = item['reposts_count']
             comments_count = item['comments_count']
             attitudes_count = item['attitudes_count']
-​
+
             a_weibo = {
                 'typ': typ,
                 'mid': mid,
@@ -184,14 +184,14 @@ def get_commented_weibo_by_uid(uid, cookie=None):
                 'comments_count': comments_count,
                 'attitudes_count': attitudes_count
             }
-​
+
             print(a_weibo)
-​
+
             df = pd.concat([df, pd.DataFrame({
                 key: [val] for key, val in a_weibo.items()
             })])
             df = df.append(a_weibo, ignore_index=True)
-​
+
         since_id = resp_json['data']['since_id']
         cur_page += 1
         df.drop_duplicates(keep='first', subset=['weibo_link'], inplace=True)
@@ -202,8 +202,8 @@ def get_commented_weibo_by_uid(uid, cookie=None):
         sleep(slp_sec_per_req)
         params['since_id'] = str(since_id)
         params['page'] = str(cur_page)
-​
-​
+
+
 ### 替换成新版 weibo.com 登录后的 cookie，参考视频 https://www.bilibili.com/video/BV1934y127ZM/
 cookie = 'SINAGLOBAL=替换成登录后的 cookie'
 ### uid 是微博用户的唯一标识，可参考链接 https://weibo-crawl-visual.buyixiao.xyz/user-guide#id
