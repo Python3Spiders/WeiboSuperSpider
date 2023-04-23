@@ -17,7 +17,7 @@ headers = {
     'User-Agent': user_agent
 }
 
-save_per_n_page = 10
+save_per_n_page = 1
 
 from datetime import datetime
 
