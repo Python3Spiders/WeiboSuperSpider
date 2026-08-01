@@ -12,33 +12,6 @@
 
 本项目代码仅作为爬虫技术学习之用，学习者务必遵循中华人民共和国法律!
 
-### 代理推荐
-
-<div align="center">
-<a href="https://www.ipwo.net/?ref=githubPython3Spiders" target="_blank">
-    <img width="750" height="200" alt="f299f2d7c22302b089b132c6008fd7e7" src="https://github.com/user-attachments/assets/3324f431-cea3-403e-94bf-899cb2ffa23a" />
-</a>
-</div>
-
-#### 官网地址
-
-[ipwo 官网](https://www.ipwo.net/?ref=githubPython3Spiders)
-
-### 功能介绍
-
-- 免费试用，先体验再选择
-- 9000万+真实住宅IP，覆盖220+国家和地区
-- 支持动态住宅代理、静态住宅代理(ISP)
-- 适用于数据抓取、电商、广告验证、SEO监控等场景
-- 支持HTTP/HTTPS/SOCKS5协议，兼容性强
-- 纯净IP池，实时更新，99.9%连接成功率
-- 支持指定国家城市地区访问，保护隐私
-
-
-IPWO爬虫代理资源为采集、跨境与测试项目提供支持(免费试用，流量不过期，爬虫使用保护账号不封号)学习者务必遵循法律！
-IPWO提供的真实住宅 IP源于195 + 国家 / 地区精准定位，大幅降低被封禁风险，支持HTTP/HTTPS/SOCKS5多种协议和平台，确保用户的灵活性99.9% 稳定运行率。
-
-
 ### 作者简介
 
 |作者|[inspurer](https://inspurer.github.io/2018/06/07/%E6%9C%88%E5%B0%8F%E6%B0%B4%E9%95%BF%E7%9A%84%E7%94%B1%E6%9D%A5/#more)|
